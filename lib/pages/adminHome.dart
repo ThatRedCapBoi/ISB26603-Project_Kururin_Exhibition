@@ -2,19 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:Project_Kururin_Exhibition/common/theme.dart';
 
 import 'package:Project_Kururin_Exhibition/models/admin.dart';
-import 'package:Project_Kururin_Exhibition/pages/adminHome.dart';
+import 'package:Project_Kururin_Exhibition/pages/adminDashboard.dart';
 import 'package:Project_Kururin_Exhibition/pages/adminBooking.dart';
 
-class AdminDashboard extends StatefulWidget {
+class AdminHomePage extends StatefulWidget {
   final Admin admin;
 
-  const AdminDashboard({super.key, required this.admin});
+  const AdminHomePage({super.key, required this.admin});
+
   @override
-  State<AdminDashboard> createState() => _AdminDashboardState();
+  State<AdminHomePage> createState() => _AdminHomePageState();
 }
 
-class _AdminDashboardState extends State<AdminDashboard> {
-  int _selectedIndex = 1;
+class _AdminHomePageState extends State<AdminHomePage> {
+  int _selectedIndex = 0;
 
   void _onDestinationSelected(int index) {
     setState(() {
@@ -61,7 +62,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'Admin User Management Page',
+              'Welcome, ${widget.admin.name}!',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
