@@ -1,12 +1,18 @@
-import 'package:Project_Kururin_Exhibition/pages/adminDashboard.dart';
-import 'package:Project_Kururin_Exhibition/pages/adminHome.dart';
 import 'package:flutter/material.dart';
 
-import 'package:Project_Kururin_Exhibition/common/theme.dart';
 import 'package:Project_Kururin_Exhibition/widgets/components.dart';
 
 import 'package:Project_Kururin_Exhibition/models/admin.dart';
-import 'package:Project_Kururin_Exhibition/services/admin_services.dart';
+
+import 'package:Project_Kururin_Exhibition/pages/homePage.dart';
+// import 'package:Project_Kururin_Exhibition/pages/registration.dart';
+import 'package:Project_Kururin_Exhibition/pages/login.dart';
+
+import 'package:Project_Kururin_Exhibition/pages/user/userProfile.dart';
+import 'package:Project_Kururin_Exhibition/pages/user/userBookingList.dart';
+import 'package:Project_Kururin_Exhibition/pages/user/userBookingForm.dart';
+
+import 'package:Project_Kururin_Exhibition/pages/admin/adminHome.dart';
 
 class demoHomePage extends StatefulWidget {
   const demoHomePage({super.key, required this.title});
@@ -47,6 +53,20 @@ class _demoHomePageState extends State<demoHomePage> {
             SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return HomePage();
+                    },
+                  ),
+                );
+              },
+              child: Text("Home Page"),
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
                 // Navigator.push(
                 //   context,
                 //   MaterialPageRoute(
@@ -61,14 +81,14 @@ class _demoHomePageState extends State<demoHomePage> {
             SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) {
-                //       return LoginPage();
-                //     },
-                //   ),
-                // );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return LoginPage();
+                    },
+                  ),
+                );
               },
               child: Text("Login"),
             ),
@@ -85,28 +105,42 @@ class _demoHomePageState extends State<demoHomePage> {
             SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) {
-                //       return UserProfilePage();
-                //     },
-                //   ),
-                // );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return ProfilePage();
+                    },
+                  ),
+                );
               },
               child: Text("User Profile"),
             ),
             SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) {
-                //       return BoothBookingFormPage();
-                //     },
-                //   ),
-                // );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return BookingListPage(userEmail: 'test@mail.com');
+                    },
+                  ),
+                );
+              },
+              child: Text("Booth Booking List"),
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return BookingFormPage(userEmail: 'test@mail.com');
+                    },
+                  ),
+                );
               },
               child: Text("Booth Booking Form"),
             ),
@@ -142,8 +176,8 @@ class _demoHomePageState extends State<demoHomePage> {
                     builder: (context) {
                       // Replace with a valid Admin instance for demonstration
                       Admin demoAdmin = Admin(
-                        id: '1',
-                        name: 'Demo Admin',
+                        id: 1,
+                        name: 'Demo Admin 2025',
                         email: 'demo@admin.com',
                         password: '',
                       );

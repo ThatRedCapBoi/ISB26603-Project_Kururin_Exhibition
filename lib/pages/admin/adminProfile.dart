@@ -1,52 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:Project_Kururin_Exhibition/common/theme.dart';
 
 import 'package:Project_Kururin_Exhibition/models/admin.dart';
-import 'package:Project_Kururin_Exhibition/pages/adminHome.dart';
-import 'package:Project_Kururin_Exhibition/pages/adminBooking.dart';
 
-class AdminDashboard extends StatefulWidget {
+import 'package:Project_Kururin_Exhibition/pages/homePage.dart';
+
+import 'package:Project_Kururin_Exhibition/pages/admin/adminNavigation.dart';
+
+class AdminProfilePage extends StatefulWidget {
   final Admin admin;
 
-  const AdminDashboard({super.key, required this.admin});
+  const AdminProfilePage({super.key, required this.admin});
+
   @override
-  State<AdminDashboard> createState() => _AdminDashboardState();
+  State<AdminProfilePage> createState() => _AdminProfilePageState();
 }
 
-class _AdminDashboardState extends State<AdminDashboard> {
-  int _selectedIndex = 1;
-
-  void _onDestinationSelected(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    switch (index) {
-      case 0:
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AdminHomePage(admin: widget.admin),
-          ),
-        );
-        break;
-      case 1:
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AdminDashboard(admin: widget.admin),
-          ),
-        );
-        break;
-      case 2:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AdminBookingPage(admin: widget.admin),
-          ),
-        );
-        break;
-    }
-  }
+class _AdminProfilePageState extends State<AdminProfilePage> {
+  int _selectedIndex = 3;
 
   @override
   Widget build(BuildContext context) {
@@ -61,19 +31,38 @@ class _AdminDashboardState extends State<AdminDashboard> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'Admin User Management Page',
+              'Admin Profile Page',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.primary,
               ),
             ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return HomePage();
+                    },
+                  ),
+                );
+              },
+              child: const Text('Logout'),
+            ),
           ],
         ),
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
-        onDestinationSelected: _onDestinationSelected,
+        onDestinationSelected: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+          onAdminDestinationSelected(context, index, widget.admin);
+        },
         destinations: const [
           NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
           NavigationDestination(

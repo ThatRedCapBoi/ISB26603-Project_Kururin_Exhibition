@@ -1,53 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:Project_Kururin_Exhibition/common/theme.dart';
 
 import 'package:Project_Kururin_Exhibition/models/admin.dart';
-import 'package:Project_Kururin_Exhibition/pages/adminDashboard.dart';
-import 'package:Project_Kururin_Exhibition/pages/adminBooking.dart';
 
-class AdminHomePage extends StatefulWidget {
+import 'package:Project_Kururin_Exhibition/pages/admin/adminNavigation.dart';
+
+class AdminDashboard extends StatefulWidget {
   final Admin admin;
 
-  const AdminHomePage({super.key, required this.admin});
+  const AdminDashboard({super.key, required this.admin});
 
   @override
-  State<AdminHomePage> createState() => _AdminHomePageState();
+  State<AdminDashboard> createState() => _AdminDashboardState();
 }
 
-class _AdminHomePageState extends State<AdminHomePage> {
-  int _selectedIndex = 0;
-
-  void _onDestinationSelected(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    switch (index) {
-      case 0:
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AdminHomePage(admin: widget.admin),
-          ),
-        );
-        break;
-      case 1:
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AdminDashboard(admin: widget.admin),
-          ),
-        );
-        break;
-      case 2:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AdminBookingPage(admin: widget.admin),
-          ),
-        );
-        break;
-    }
-  }
+class _AdminDashboardState extends State<AdminDashboard> {
+  int _selectedIndex = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +29,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'Welcome, ${widget.admin.name}!',
+              'Admin User Management Page',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -74,7 +41,12 @@ class _AdminHomePageState extends State<AdminHomePage> {
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
-        onDestinationSelected: _onDestinationSelected,
+        onDestinationSelected: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+          onAdminDestinationSelected(context, index, widget.admin);
+        },
         destinations: const [
           NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
           NavigationDestination(

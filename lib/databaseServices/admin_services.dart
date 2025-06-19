@@ -47,7 +47,7 @@ class AdminServices {
     final List<Map<String, dynamic>> admins = await db.query(tableName);
     return List.generate(admins.length, (i) {
       return Admin(
-        id: admins[i][columnId] as String,
+        id: admins[i][columnId] as int?,
         name: admins[i][columnName] as String,
         password: admins[i][columnPassword] as String,
         email: admins[i][columnEmail] as String,

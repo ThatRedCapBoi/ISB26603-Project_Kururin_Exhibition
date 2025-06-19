@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../models/booth_book.dart';
-import '../database/database_helper.dart';
+import 'package:Project_Kururin_Exhibition/databaseServices/eventSphere_db.dart';
+import 'package:Project_Kururin_Exhibition/models/booth_book.dart';
 
 class BookingFormPage extends StatefulWidget {
   final String userEmail;
@@ -26,7 +26,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
     'Extra Tables',
     'Lounge Seating',
     'Carpet',
-    'Brochure Racks'
+    'Brochure Racks',
   ];
   List<String> _selectedItems = [];
 
@@ -50,9 +50,11 @@ class _BookingFormPageState extends State<BookingFormPage> {
   Future<void> _selectDate(BuildContext context) async {
     final pickedDate = await showDatePicker(
       context: context,
-      initialDate: widget.existingBooking != null
-          ? DateTime.tryParse(widget.existingBooking!.date) ?? DateTime.now()
-          : DateTime.now(),
+      initialDate:
+          widget.existingBooking != null
+              ? DateTime.tryParse(widget.existingBooking!.date) ??
+                  DateTime.now()
+              : DateTime.now(),
       firstDate: DateTime.now(),
       lastDate: DateTime(2100),
     );
@@ -66,11 +68,10 @@ class _BookingFormPageState extends State<BookingFormPage> {
     setState(() {
       selected ??= false;
       if (selected == true && !_selectedItems.contains(item)) {
-  _selectedItems.add(item);
-} else if (selected == false && _selectedItems.contains(item)) {
-  _selectedItems.remove(item);
-}
-
+        _selectedItems.add(item);
+      } else if (selected == false && _selectedItems.contains(item)) {
+        _selectedItems.remove(item);
+      }
     });
   }
 
@@ -85,10 +86,10 @@ class _BookingFormPageState extends State<BookingFormPage> {
       );
 
       if (widget.existingBooking == null) {
-        await DatabaseHelper.instance.insertBooking(booking);
+        await EventSphereDB.instance.insertBooking(booking);
         _showMessage('Booking Created');
       } else {
-        await DatabaseHelper.instance.updateBooking(booking);
+        await EventSphereDB.instance.updateBooking(booking);
         _showMessage('Booking Updated');
       }
 
@@ -106,9 +107,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
   Widget build(BuildContext context) {
     final isEdit = widget.existingBooking != null;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(isEdit ? 'Edit Booking' : 'New Booking'),
-      ),
+      appBar: AppBar(title: Text(isEdit ? 'Edit Booking' : 'New Booking')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -121,8 +120,11 @@ class _BookingFormPageState extends State<BookingFormPage> {
                   labelText: 'Booth Type',
                   border: OutlineInputBorder(),
                 ),
-                validator: (value) =>
-                    value == null  value.trim().isEmpty ? 'Please enter booth type' : null,
+                validator:
+                    (value) =>
+                        value == null || value.trim().isEmpty
+                            ? 'Please enter booth type'
+                            : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -136,11 +138,17 @@ class _BookingFormPageState extends State<BookingFormPage> {
                     onPressed: () => _selectDate(context),
                   ),
                 ),
-                validator: (value) =>
-                    value == null  value.trim().isEmpty ? 'Please select a date' : null,
+                validator:
+                    (value) =>
+                        value == null || value.trim().isEmpty
+                            ? 'Please select a date'
+                            : null,
               ),
               const SizedBox(height: 24),
-              const Text("Select Additional Items:", style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text(
+                "Select Additional Items:",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               ..._items.map((item) {
                 return CheckboxListTile(
                   title: Text(item),
