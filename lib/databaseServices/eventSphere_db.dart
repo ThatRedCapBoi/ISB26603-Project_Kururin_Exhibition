@@ -22,14 +22,14 @@ class EventSphereDB {
   Future _createDB(Database db, int version) async {
     const idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
 
-    // Users table
+    // Users table - Corrected to match User model properties
     await db.execute('''
       CREATE TABLE users (
-        userID $idType,
-        username TEXT NOT NULL,
-        userEmail TEXT NOT NULL UNIQUE,
-        userphone TEXT NOT NULL,
-        userpassword TEXT NOT NULL
+        id $idType,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL UNIQUE,
+        phone TEXT NOT NULL,
+        password TEXT NOT NULL
       );
     ''');
 
@@ -58,17 +58,20 @@ class EventSphereDB {
 
   Future<int> insertUser(User u) async {
     final db = await database;
-    return await db.insert('users', u.toMap());
+    // Keys in u.toMap() ('id', 'name', 'email', 'phone', 'password') now directly match table columns
+    return await db.insert('users', u.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   Future<User?> getUserByEmail(String email) async {
     final db = await database;
     final maps = await db.query(
       'users',
+      // Ensure these column names match the table and User.fromMap
       columns: ['id', 'name', 'email', 'phone', 'password'],
       where: 'email = ?',
       whereArgs: [email],
     );
+    // User.fromMap will correctly map these columns to User object properties
     return maps.isNotEmpty ? User.fromMap(maps.first) : null;
   }
 
@@ -76,7 +79,7 @@ class EventSphereDB {
     final db = await database;
     return await db.update(
       'users',
-      u.toMap(),
+      u.toMap(), // Uses correct column names from User.toMap()
       where: 'id = ?',
       whereArgs: [u.id],
     );
@@ -124,6 +127,7 @@ class EventSphereDB {
     final db = await database;
     return await db.delete('bookings', where: 'id = ?', whereArgs: [id]);
   }
+
   // ---------- ADMINS (admin.dart) ----------
 
   Future<int> insertAdmin(Admin a) async {

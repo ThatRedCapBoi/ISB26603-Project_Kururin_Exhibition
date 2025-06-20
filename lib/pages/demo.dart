@@ -5,7 +5,7 @@ import 'package:Project_Kururin_Exhibition/widgets/components.dart';
 import 'package:Project_Kururin_Exhibition/models/admin.dart';
 
 import 'package:Project_Kururin_Exhibition/pages/homePage.dart';
-// import 'package:Project_Kururin_Exhibition/pages/registration.dart';
+import 'package:Project_Kururin_Exhibition/pages/registration.dart';
 import 'package:Project_Kururin_Exhibition/pages/login.dart';
 
 import 'package:Project_Kururin_Exhibition/pages/user/userProfile.dart';
@@ -67,14 +67,14 @@ class _demoHomePageState extends State<demoHomePage> {
             SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) {
-                //       return RegistrationPage();
-                //     },
-                //   ),
-                // );
+                 Navigator.push(
+                   context,
+                   MaterialPageRoute(
+                     builder: (context) {
+                       return RegistrationPage();
+                     },
+                   ),
+                 );
               },
               child: Text("Registration"),
             ),

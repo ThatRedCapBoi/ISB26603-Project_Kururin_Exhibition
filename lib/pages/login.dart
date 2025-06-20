@@ -1,9 +1,8 @@
+import 'package:sqflite/sqflite.dart';
 import 'package:flutter/material.dart';
 import 'package:Project_Kururin_Exhibition/databaseServices/eventSphere_db.dart';
-// import 'package:Project_Kururin_Exhibition/routes/app_routes.dart';
-
 import 'package:Project_Kururin_Exhibition/pages/user/userProfile.dart';
-
+import 'package:Project_Kururin_Exhibition/pages/registration.dart';
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
   @override
@@ -16,21 +15,56 @@ class _LoginPageState extends State<LoginPage> {
   final pwCtrl = TextEditingController();
 
   bool isVisible = false;
+  bool _isLoading = false; // Add loading state for login
+
   void _login() async {
+    if (_isLoading) return;
+
+    setState(() {
+      _isLoading = true; // Set loading state to true
+    });
+
     final email = emailCtrl.text.trim();
     final pw = pwCtrl.text;
-    final u = await EventSphereDB.instance.getUserByEmail(email);
-    if (u != null && u.password == pw) {
-      Navigator.pushReplacementNamed(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const ProfilePage(),
-        ).settings.name!,
+
+    if (email.isEmpty || pw.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter email and password.')),
       );
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Invalid login')));
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+
+    try {
+      final u = await EventSphereDB.instance.getUserByEmail(email);
+
+      if (u != null && u.password == pw) {
+        // Upon successful login, navigate to the user profile page
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Login successful!')),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const ProfilePage(),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Invalid login credentials')));
+      }
+    } catch (e) {
+      print('Login error: $e'); // Print to console for debugging
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An error occurred during login: ${e.toString()}')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false; // Always set loading state to false
+      });
     }
   }
 
@@ -43,8 +77,8 @@ class _LoginPageState extends State<LoginPage> {
         children: [
           TextField(
             controller: emailCtrl,
-            obscureText: isVisible,
             decoration: const InputDecoration(labelText: 'Email'),
+            keyboardType: TextInputType.emailAddress,
           ),
           TextField(
             controller: pwCtrl,
@@ -62,14 +96,22 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
           const SizedBox(height: 20),
-          ElevatedButton(onPressed: _login, child: const Text('Login')),
+          _isLoading
+              ? const CircularProgressIndicator() // Show loading indicator
+              : ElevatedButton(onPressed: _login, child: const Text('Login')),
           TextButton(
-            onPressed:
-                () => Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ProfilePage()),
-                ),
-            child: const Text('Register / Update Profile'),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const RegistrationPage()),
+            ),
+            child: const Text('Register Here'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ProfilePage()), // Direct to profile for update
+            ),
+            child: const Text('Update Profile'),
           ),
         ],
       ),
