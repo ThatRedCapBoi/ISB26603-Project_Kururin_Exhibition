@@ -99,8 +99,8 @@ class EventSphereDB {
   // ---------- BOOKINGS (booth_book.dart) ----------
 
   Future<int> insertBooking(Booking b) async {
-    final db = await database;
-    return await db.insert('bookings', b.toMap());
+    final db = await database; 
+    return await db.insert('bookings', b.toMap(),  conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   Future<List<Booking>> getBookingsByUser(String email) async {
@@ -118,14 +118,14 @@ class EventSphereDB {
     return await db.update(
       'bookings',
       b.toMap(),
-      where: 'id = ?',
-      whereArgs: [b.id],
+      where: 'bookID = ?',
+      whereArgs: [b.bookID],
     );
   }
 
-  Future<int> deleteBooking(int id) async {
+  Future<int> deleteBooking(int bookID) async {
     final db = await database;
-    return await db.delete('bookings', where: 'id = ?', whereArgs: [id]);
+    return await db.delete('bookings', where: 'bookID = ?', whereArgs: [bookID]);
   }
 
   // ---------- ADMINS (admin.dart) ----------

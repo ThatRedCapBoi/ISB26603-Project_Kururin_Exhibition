@@ -78,7 +78,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
   Future<void> _saveBooking() async {
     if (_formKey.currentState!.validate()) {
       final booking = Booking(
-        id: widget.existingBooking?.id,
+        bookID: widget.existingBooking?.bookID,
         userEmail: widget.userEmail,
         boothType: _boothCtrl.text.trim(),
         date: _dateCtrl.text.trim(),

@@ -1,12 +1,12 @@
 class Booking {
-  final int? id;
+  final int? bookID;
   final String userEmail;
   final String boothType;
   final List<String> additionalItems;
   final String date;
 
   Booking({
-    this.id,
+    this.bookID,
     required this.userEmail,
     required this.boothType,
     required this.additionalItems,
@@ -14,7 +14,7 @@ class Booking {
   });
 
   Map<String, dynamic> toMap() => {
-        'id': id,
+        'bookID': bookID,
         'userEmail': userEmail,
         'boothType': boothType,
         'additionalItems': additionalItems.join(','),
@@ -22,7 +22,7 @@ class Booking {
       };
 
   factory Booking.fromMap(Map<String, dynamic> map) => Booking(
-        id: map['id'],
+        bookID: map['bookID'],
         userEmail: map['userEmail'],
         boothType: map['boothType'],
         additionalItems: map['additionalItems'].split(','),
