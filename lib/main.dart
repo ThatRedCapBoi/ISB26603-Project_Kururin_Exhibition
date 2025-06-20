@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-
 import "common/theme.dart";
 
 import 'package:Project_Kururin_Exhibition/pages/demo.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  sqfliteFfiInit();
-  databaseFactory = databaseFactoryFfi;
   runApp(const MainApp());
 }
 

@@ -64,35 +64,37 @@ class _AdminHomePageState extends State<AdminHomePage> {
           NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final demoAdmin = Admin(
-            name: 'Demo Admin 1',
-            email: 'demo@admin.com',
-            password: 'Admin@123',
-            id: null, // In production, hash this!
-          );
-          try {
-            final db = EventSphereDB.instance;
-            final insertedId = await db.insertAdmin(demoAdmin);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Demo Admin inserted with ID: $insertedId'),
-              ),
-            );
-          } catch (e) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Failed to insert admin: $e')),
-            );
-          }
-        },
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Colors.white,
-        tooltip: 'Add New Admin',
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: addAdminButton(context),
     );
   }
+}
+
+Widget addAdminButton(BuildContext context) {
+  return FloatingActionButton(
+    onPressed: () async {
+      final demoAdmin = Admin(
+        name: 'Demo Admin 1',
+        email: 'demo@admin.com',
+        password: 'Admin@123',
+        id: null, // In production, hash this!
+      );
+      try {
+        final db = EventSphereDB.instance;
+        final insertedId = await db.insertAdmin(demoAdmin);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Demo Admin inserted with ID: $insertedId')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to insert admin: $e')));
+      }
+    },
+    backgroundColor: Theme.of(context).colorScheme.primary,
+    foregroundColor: Colors.white,
+    tooltip: 'Add New Admin',
+    child: const Icon(Icons.add),
+  );
 }
 
 Widget adminTable(BuildContext context) {

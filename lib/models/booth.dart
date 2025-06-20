@@ -18,14 +18,14 @@ class boothPackage {
         boothDescription:
             "3x3m space with table and 2 chairs. Ideal for startups and small vendors.",
         boothCapacity: "2 people",
-        boothImage: 'assets/images/standard2.jpg',
+        boothImage: 'assets/images/standardbooth.jpg',
       ),
       boothPackage(
         boothName: "Premium Booth",
         boothDescription:
             "4x4m space with premium decor, 4 chairs, spotlight lighting and name signage.",
         boothCapacity: "4 people",
-        boothImage: "assets/images/premium2.jpg",
+        boothImage: "assets/images/premiumbooth.png",
       ),
       boothPackage(
         boothName: "VIP Lounge",
