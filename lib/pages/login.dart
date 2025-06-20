@@ -1,11 +1,8 @@
-import 'package:Project_Kururin_Exhibition/pages/user/userHome.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:flutter/material.dart';
 import 'package:Project_Kururin_Exhibition/databaseServices/eventSphere_db.dart';
 import 'package:Project_Kururin_Exhibition/pages/user/userProfile.dart';
 import 'package:Project_Kururin_Exhibition/pages/registration.dart';
-import 'package:Project_Kururin_Exhibition/pages/user/userHome.dart';
-
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
   @override
@@ -45,24 +42,24 @@ class _LoginPageState extends State<LoginPage> {
 
       if (u != null && u.password == pw) {
         // Upon successful login, navigate to the user profile page
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Login successful!')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Login successful!')),
+        );
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => UserHomePage(user: u)),
+          MaterialPageRoute(
+            builder: (context) => const ProfilePage(),
+          ),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Invalid login credentials')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Invalid login credentials')));
       }
     } catch (e) {
       print('Login error: $e'); // Print to console for debugging
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('An error occurred during login: ${e.toString()}'),
-        ),
+        SnackBar(content: Text('An error occurred during login: ${e.toString()}')),
       );
     } finally {
       setState(() {
@@ -103,23 +100,17 @@ class _LoginPageState extends State<LoginPage> {
               ? const CircularProgressIndicator() // Show loading indicator
               : ElevatedButton(onPressed: _login, child: const Text('Login')),
           TextButton(
-            onPressed:
-                () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const RegistrationPage(),
-                  ),
-                ),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const RegistrationPage()),
+            ),
             child: const Text('Register Here'),
           ),
           TextButton(
-            onPressed:
-                () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ProfilePage(),
-                  ), // Direct to profile for update
-                ),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ProfilePage()), // Direct to profile for update
+            ),
             child: const Text('Update Profile'),
           ),
         ],
