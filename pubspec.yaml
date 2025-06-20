@@ -11,7 +11,6 @@ dependencies:
     sdk: flutter
   intl: ^0.20.2
   sqflite: ^2.3.2
-  sqflite_common_ffi: ^2.3.5
   path: ^1.8.3
 
 dev_dependencies:
