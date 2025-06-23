@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-
-import 'package:Project_Kururin_Exhibition/databaseServices/eventSphere_db.dart';
-
 import 'package:Project_Kururin_Exhibition/pages/admin/adminNavigation.dart';
-
 import 'package:Project_Kururin_Exhibition/models/admin.dart';
+import 'package:Project_Kururin_Exhibition/pages/login.dart'; // For logout functionality
+import 'package:cloud_firestore/cloud_firestore.dart'; // Add this import
+import 'package:firebase_auth/firebase_auth.dart'; // Add this import
 
 class AdminHomePage extends StatefulWidget {
   final Admin admin;
@@ -22,8 +21,22 @@ class _AdminHomePageState extends State<AdminHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('EventSphere'),
+        title: const Text('EventSphere Admin Dashboard'), // More specific title
         automaticallyImplyLeading: false,
+        backgroundColor: Colors.deepPurple, // Added a color for consistency
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.white),
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const LoginPage()),
+                (Route<dynamic> route) => false,
+              );
+            },
+            tooltip: 'Logout',
+          ),
+        ],
       ),
       backgroundColor: const Color(0xFFFEFEFA),
       body: Center(
@@ -33,13 +46,14 @@ class _AdminHomePageState extends State<AdminHomePage> {
             Text(
               'Welcome, ${widget.admin.name}!',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 24, // Increased font size for welcome message
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.primary,
               ),
             ),
             const SizedBox(height: 24),
-            adminTable(context),
+            // Updated adminTable to use Firestore
+            Expanded(child: adminTable(context)),
           ],
         ),
       ),
@@ -49,105 +63,104 @@ class _AdminHomePageState extends State<AdminHomePage> {
           setState(() {
             _selectedIndex = index;
           });
-          onAdminDestinationSelected(context, index, widget.admin);
+          // Call the function from adminNavigation.dart
+          onAdminDestinationSelected(context, index, widget.admin); // Changed function name
         },
         destinations: const [
           NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-          NavigationDestination(
-            icon: Icon(Icons.dashboard),
-            label: 'Dashboard',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.book_online),
-            label: 'Booking',
-          ),
+          NavigationDestination(icon: Icon(Icons.dashboard), label: 'Dashboard'),
+          NavigationDestination(icon: Icon(Icons.event), label: 'Bookings'),
           NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
-      floatingActionButton: addAdminButton(context),
     );
   }
 }
 
-Widget addAdminButton(BuildContext context) {
-  return FloatingActionButton(
-    onPressed: () async {
-      final demoAdmin = Admin(
-        name: 'Demo Admin 1',
-        email: 'demo@admin.com',
-        password: 'Admin@123',
-        id: null, // In production, hash this!
-      );
-      try {
-        final db = EventSphereDB.instance;
-        final insertedId = await db.insertAdmin(demoAdmin);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Demo Admin inserted with ID: $insertedId')),
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Failed to insert admin: $e')));
-      }
-    },
-    backgroundColor: Theme.of(context).colorScheme.primary,
-    foregroundColor: Colors.white,
-    tooltip: 'Add New Admin',
-    child: const Icon(Icons.add),
-  );
+// Renamed from adminTable to _AdminTable and made it a StatefulWidget to manage its own state (e.g., refresh)
+class _AdminTable extends StatefulWidget {
+  const _AdminTable({super.key});
+
+  @override
+  State<_AdminTable> createState() => _AdminTableState();
 }
 
-Widget adminTable(BuildContext context) {
-  return FutureBuilder<List<Admin>>(
-    future: EventSphereDB.instance.getAllAdmins(),
-    builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return const CircularProgressIndicator();
-      } else if (snapshot.hasError) {
-        return Text('Error: ${snapshot.error}');
-      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-        return const Text('No admins found.');
-      } else {
-        final admins = snapshot.data!;
-        return DataTable(
-          columns: const [
-            DataColumn(label: Text('ID')),
-            DataColumn(label: Text('Name')),
-            DataColumn(label: Text('Email')),
-            DataColumn(label: Text('')), // For trailing icon
-          ],
-          rows:
-              admins
-                  .map(
-                    (admin) => DataRow(
-                      cells: [
-                        DataCell(Text(admin.id?.toString() ?? '')),
-                        DataCell(Text(admin.name)),
-                        DataCell(Text(admin.email)),
-                        DataCell(
-                          IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            tooltip: 'Delete',
-                            onPressed: () async {
-                              if (admin.id != null) {
-                                await EventSphereDB.instance.deleteAdmin(
-                                  admin.id!,
-                                );
-                                // Refresh the table after deletion
-                                (context as Element).markNeedsBuild();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Admin deleted')),
-                                );
-                              }
-                            },
-                          ),
-                        ),
-                      ],
+class _AdminTableState extends State<_AdminTable> {
+  // Method to delete an admin from Firestore
+  Future<void> _deleteAdmin(String adminId) async {
+    try {
+      await FirebaseFirestore.instance.collection('administrators').doc(adminId).delete();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Admin deleted successfully!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to delete admin: ${e.toString()}')),
+      );
+      print('Error deleting admin: $e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance.collection('administrators').snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        }
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return const Center(child: Text('No administrators found.'));
+        }
+
+        final admins = snapshot.data!.docs.map((doc) {
+          return Admin.fromFirestore(doc); // Use the updated fromFirestore factory
+        }).toList();
+
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: DataTable(
+            columns: const [
+              DataColumn(label: Text('ID (UID)')), // Changed to UID for Firebase
+              DataColumn(label: Text('Name')),
+              DataColumn(label: Text('Email')),
+              DataColumn(label: Text('Actions')), // For delete button
+            ],
+            rows: admins.map(
+              (admin) => DataRow(
+                cells: [
+                  DataCell(Text(admin.id)), // Display UID
+                  DataCell(Text(admin.name)),
+                  DataCell(Text(admin.email)),
+                  DataCell(
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      tooltip: 'Delete',
+                      onPressed: () {
+                        if (admin.id.isNotEmpty) {
+                          _deleteAdmin(admin.id);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Admin ID is missing.')),
+                          );
+                        }
+                      },
                     ),
-                  )
-                  .toList(),
+                  ),
+                ],
+              ),
+            ).toList(),
+          ),
         );
-      }
-    },
-  );
+      },
+    );
+  }
+}
+
+// This is the function called in AdminHomePage, you might want to adjust its signature.
+Widget adminTable(BuildContext context) {
+  return const _AdminTable(); // Use the new StatefulWidget
 }

@@ -1,60 +1,43 @@
-class boothPackage {
-  String boothName;
-  String boothDescription;
-  String boothCapacity;
-  String boothImage;
+// lib/models/booth.dart
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-  boothPackage({
+class BoothPackage { // Renamed from boothPackage to BoothPackage for Dart convention
+  final String? id; // Firestore Document ID
+  final String boothName;
+  final String boothDescription;
+  final String boothCapacity;
+  final String boothImage; // Assuming this might be a URL to image in Firebase Storage or a static asset path
+
+  BoothPackage({
+    this.id,
     required this.boothName,
     required this.boothDescription,
     required this.boothCapacity,
     required this.boothImage,
   });
 
-  static List<boothPackage> getBoothPackages() {
-    return [
-      boothPackage(
-        boothName: "Standard Booth",
-        boothDescription:
-            "3x3m space with table and 2 chairs. Ideal for startups and small vendors.",
-        boothCapacity: "2 people",
-        boothImage: 'assets/images/standardbooth.jpg',
-      ),
-      boothPackage(
-        boothName: "Premium Booth",
-        boothDescription:
-            "4x4m space with premium decor, 4 chairs, spotlight lighting and name signage.",
-        boothCapacity: "4 people",
-        boothImage: "assets/images/premiumbooth.png",
-      ),
-      boothPackage(
-        boothName: "VIP Lounge",
-        boothDescription:
-            "5x5m lounge setup with leather seating, carpet, and branded backdrop wall.",
-        boothCapacity: "Up to 20+ people",
-        boothImage: "assets/images/viplounge.jpg",
-      ),
-      boothPackage(
-        boothName: "Outdoor Pavilion",
-        boothDescription:
-            "5x5m open-air booth, weather-proof tent, portable AC, suitable for food vendors.",
-        boothCapacity: "Up to 50+ people",
-        boothImage: "assets/images/outdoorpavilion.jpg",
-      ),
-      boothPackage(
-        boothName: "Demo Stage Booth",
-        boothDescription:
-            "3x5m booth with a stage platform and microphone setup, ideal for product demos.",
-        boothCapacity: "4 people",
-        boothImage: "assets/images/demobooth.jpg",
-      ),
-      boothPackage(
-        boothName: "Media Sponsor Booth",
-        boothDescription:
-            "Special 4x4m area for media & sponsors with high visibility and screen display.",
-        boothCapacity: "4 people",
-        boothImage: "assets/images/mediasponsor.jpeg",
-      ),
-    ];
+  // Factory constructor to create a BoothPackage from a Firestore DocumentSnapshot
+  factory BoothPackage.fromFirestore(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    return BoothPackage(
+      id: doc.id,
+      boothName: data['boothName'] ?? '',
+      boothDescription: data['boothDescription'] ?? '',
+      boothCapacity: data['boothCapacity'] ?? '',
+      boothImage: data['boothImage'] ?? '',
+    );
+  }
+
+  // Method to convert BoothPackage to a Map for Firestore
+  Map<String, dynamic> toFirestore() {
+    return {
+      'boothName': boothName,
+      'boothDescription': boothDescription,
+      'boothCapacity': boothCapacity,
+      'boothImage': boothImage,
+    };
   }
 }
+
+// You can remove the static getBoothPackages() method if you're fetching from Firestore
+// static List<boothPackage> getBoothPackages() { ... }

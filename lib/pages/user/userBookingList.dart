@@ -1,106 +1,186 @@
-import 'package:Project_Kururin_Exhibition/models/users.dart';
 import 'package:flutter/material.dart';
-
-import 'package:Project_Kururin_Exhibition/models/booth_book.dart';
-import 'package:Project_Kururin_Exhibition/databaseServices/EventSphere_db.dart';
-
-import 'package:Project_Kururin_Exhibition/pages/user/userBookingForm.dart';
-import 'package:Project_Kururin_Exhibition/pages/user/userNavigation.dart';
+import 'package:Project_Kururin_Exhibition/models/booth_book.dart'; // Make sure this model has toFirestore()
+import 'package:Project_Kururin_Exhibition/models/users.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Added Firebase Firestore import
+import 'package:firebase_auth/firebase_auth.dart' as auth; // Added Firebase Auth import
 
 class BookingListPage extends StatefulWidget {
   final User user;
-  const BookingListPage({super.key, required this.user});
+  final Booking? existingBooking;
+
+  const BookingListPage({super.key, required this.user, this.existingBooking});
 
   @override
-  State<BookingListPage> createState() => _BookingListPageState();
+  State<BookingListPage> createState() => _BookingListPage();
 }
 
-class _BookingListPageState extends State<BookingListPage> {
-  List<Booking> _bookings = [];
+class _BookingListPage extends State<BookingListPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _boothCtrl = TextEditingController();
+  final _dateCtrl = TextEditingController();
 
-  int _selectedIndex = 1;
+  final List<String> _items = [
+    'Extra Chairs',
+    'Extra Tables',
+    'Lounge Seating',
+    'Carpet',
+    'Brochure Racks',
+  ];
+  List<String> _selectedItems = [];
+
+  bool get isEdit => widget.existingBooking != null;
 
   @override
   void initState() {
     super.initState();
-    _loadBookings();
+    if (widget.existingBooking != null) {
+      _boothCtrl.text = widget.existingBooking!.boothType;
+      _dateCtrl.text = widget.existingBooking!.date;
+      _selectedItems = List.from(widget.existingBooking!.additionalItems);
+    }
   }
 
-  Future<void> _loadBookings() async {
-    final data = await EventSphereDB.instance.getBookingsByUser(
-      widget.user.email,
-    );
-    setState(() => _bookings = data);
+  @override
+  void dispose() {
+    _boothCtrl.dispose();
+    _dateCtrl.dispose();
+    super.dispose();
   }
 
-  void _navigateToForm({Booking? booking}) async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder:
-            (_) => BookingFormPage(user: widget.user, existingBooking: booking),
-      ),
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2026),
     );
-    _loadBookings();
+    if (picked != null) {
+      setState(() {
+        _dateCtrl.text = "${picked.day}/${picked.month}/${picked.year}";
+      });
+    }
+  }
+
+  void _toggleItem(String item, bool? value) {
+    setState(() {
+      if (value == true) {
+        _selectedItems.add(item);
+      } else {
+        _selectedItems.remove(item);
+      }
+    });
+  }
+
+  void _saveBooking() async {
+    if (_formKey.currentState!.validate()) {
+      final user = auth.FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('User not logged in. Cannot save booking.')),
+        );
+        return;
+      }
+
+      final newBooking = Booking(
+        // For new bookings, bookID will be null and Firestore will generate one
+        // For updates, the existing bookID (Firestore Doc ID) is passed
+        bookID: widget.existingBooking?.bookID, // Assuming bookID stores Firestore doc ID
+        userEmail: user.email!, // Use current authenticated user's email
+        boothType: _boothCtrl.text.trim(),
+        additionalItems: _selectedItems,
+        date: _dateCtrl.text.trim(),
+      );
+
+      try {
+        if (isEdit) {
+          // Update existing booking in Firestore
+          if (newBooking.bookID != null) {
+            await FirebaseFirestore.instance
+                .collection('bookings')
+                .doc(newBooking.bookID) // Use the Firestore document ID
+                .update(newBooking.toFirestore());
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Booking Updated Successfully!')),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Error: No booking ID for update.')),
+            );
+          }
+        } else {
+          // Add new booking to Firestore
+          await FirebaseFirestore.instance.collection('bookings').add(newBooking.toFirestore());
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Booking Submitted Successfully!')),
+          );
+        }
+        Navigator.pop(context, true); // Pop and indicate success
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error saving booking: ${e.toString()}')),
+        );
+        print('Booking save error: $e');
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("My Bookings"),
-        automaticallyImplyLeading: false,
+        title: Text(isEdit ? 'Edit Booking' : 'New Booking'),
+        backgroundColor: Colors.deepPurple,
       ),
-      body:
-          _bookings.isEmpty
-              ? const Center(child: Text("You haven't made any bookings yet."))
-              : ListView.builder(
-                itemCount: _bookings.length,
-                itemBuilder: (context, index) {
-                  final booking = _bookings[index];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    child: ListTile(
-                      title: Text("Booth: ${booking.boothType}"),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Date: ${booking.date}"),
-                          Text("Items: ${booking.additionalItems.join(', ')}"),
-                        ],
-                      ),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.edit),
-                        onPressed: () => _navigateToForm(booking: booking),
-                      ),
-                    ),
-                  );
-                },
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextFormField(
+                controller: _boothCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Booth Type',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) => value == null || value.trim().isEmpty ? 'Please enter booth type' : null,
               ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _navigateToForm(),
-        tooltip: 'New Booking',
-        child: const Icon(Icons.add),
-      ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-          onUserDestinationSelected(context, index, widget.user);
-        },
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-          NavigationDestination(
-            icon: Icon(Icons.book_online),
-            label: 'Booking',
+              const SizedBox(height: 24),
+              TextFormField(
+                controller: _dateCtrl,
+                readOnly: true,
+                decoration: InputDecoration(
+                  labelText: 'Booking Date',
+                  border: const OutlineInputBorder(),
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.calendar_today),
+                    onPressed: () => _selectDate(context),
+                  ),
+                ),
+                validator: (value) => value == null || value.trim().isEmpty ? 'Please select a date' : null,
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                "Select Additional Items:",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              ..._items.map((item) {
+                return CheckboxListTile(
+                  title: Text(item),
+                  value: _selectedItems.contains(item),
+                  onChanged: (value) => _toggleItem(item, value),
+                );
+              }).toList(),
+              const SizedBox(height: 24),
+              ElevatedButton.icon(
+                icon: Icon(isEdit ? Icons.save : Icons.check),
+                onPressed: _saveBooking,
+                label: Text(isEdit ? 'Update Booking' : 'Submit Booking'),
+              ),
+            ],
           ),
-          NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
-        ],
+        ),
       ),
     );
   }
