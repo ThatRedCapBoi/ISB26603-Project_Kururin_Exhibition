@@ -1,3 +1,4 @@
+import 'package:Project_Kururin_Exhibition/widgets/components.dart';
 import 'package:flutter/material.dart';
 import 'package:Project_Kururin_Exhibition/models/users.dart';
 import 'package:Project_Kururin_Exhibition/pages/login.dart';
