@@ -1,61 +1,67 @@
-// lib/models/booth_book.dart
-import 'package:cloud_firestore/cloud_firestore.dart'; // Import for DocumentSnapshot
+import 'package:cloud_firestore/cloud_firestore.dart';
 
+// Represents a booking made by a user.
 class Booking {
-  final String? bookID; // Changed from int? to String? to store Firestore document ID
-  final String userEmail;
-  final String boothType;
-  final List<String> additionalItems; // Stored as List<String>
-  final String date;
+  final String? id; // Document ID from Firestore
+  final String? userEmail;
+  final String boothPackageID; // Renamed from boothType to match Firebase field 'boothPackageID'
+  final List<dynamic> selectedAddItems; // Matches 'selectedAddItems' from Firebase
+  final String bookingDate; // Renamed from 'date' to match 'bookingDate' from Firebase
+  final String eventDate; // New field from Firebase snapshot
+  final String eventTime; // New field from Firebase snapshot
+  final String status; // New field from Firebase snapshot
+  final double totalPrice; // New field from Firebase snapshot
+  final String userID; // New field from Firebase snapshot, renamed from 'userId' to 'userID'
 
   Booking({
-    this.bookID, // bookID is now the Firestore document ID (optional for new bookings)
-    required this.userEmail,
-    required this.boothType,
-    required this.additionalItems,
-    required this.date,
+    this.id,
+    this.userEmail,
+    required this.boothPackageID,
+    required this.selectedAddItems,
+    required this.bookingDate,
+    required this.eventDate,
+    required this.eventTime,
+    required this.status,
+    required this.totalPrice,
+    required this.userID,
   });
 
   // Factory constructor to create a Booking object from a Firestore DocumentSnapshot
   factory Booking.fromFirestore(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+    // Ensure 'selectedAddItems' is a List, default to empty list if null
+    List<dynamic> items = [];
+    if (data['selectedAddItems'] is List) {
+      items = List<dynamic>.from(data['selectedAddItems']);
+    }
+
     return Booking(
-      bookID: doc.id, // Set bookID to the Firestore document ID
-      userEmail: data['userEmail'] ?? '',
-      boothType: data['boothType'] ?? '',
-      // Ensure additionalItems is correctly cast from Firestore List<dynamic> to List<String>
-      additionalItems: List<String>.from(data['additionalItems'] ?? []),
-      date: data['date'] ?? '',
+      id: doc.id, // Assign the document ID
+      userEmail: data['userEmail'], // This field isn't in your image, but keeping it if it's elsewhere
+      boothPackageID: data['boothPackageID'] ?? '', // Match Firebase field name
+      selectedAddItems: items,
+      bookingDate: data['bookingDate'] ?? '', // Match Firebase field name
+      eventDate: data['eventDate'] ?? '', // Match Firebase field name
+      eventTime: data['eventTime'] ?? '', // Match Firebase field name
+      status: data['status'] ?? '', // Match Firebase field name
+      totalPrice: (data['totalPrice'] ?? 0).toDouble(), // Match Firebase field name
+      userID: data['userID'] ?? '', // Match Firebase field name (case-sensitive)
     );
   }
 
   // Method to convert Booking object to a Map for Firestore
   Map<String, dynamic> toFirestore() {
     return {
-      'userEmail': userEmail,
-      'boothType': boothType,
-      'additionalItems': additionalItems, // Stored as a native List in Firestore
-      'date': date,
+      'bookingDate': bookingDate,
+      'boothPackageID': boothPackageID,
+      'eventDate': eventDate,
+      'eventTime': eventTime,
+      'selectedAddItems': selectedAddItems,
+      'status': status,
+      'totalPrice': totalPrice,
+      'userID': userID, // Ensure case matches Firestore
+      if (userEmail != null) 'userEmail': userEmail, // Only include if userEmail is relevant for new bookings
     };
   }
-
-  // You can remove the old toMap and fromMap methods if you are fully migrating to Firebase
-  // If you still have sqflite dependencies for other parts, keep them, but they won't be used for bookings.
-  /*
-  Map<String, dynamic> toMap() => {
-        'bookID': bookID, // This would be for sqflite auto-incrementing int
-        'userEmail': userEmail,
-        'boothType': boothType,
-        'additionalItems': additionalItems.join(','), // For storing as string in sqflite
-        'date': date,
-      };
-
-  factory Booking.fromMap(Map<String, dynamic> map) => Booking(
-        bookID: map['bookID'],
-        userEmail: map['userEmail'],
-        boothType: map['boothType'],
-        additionalItems: map['additionalItems'].split(','),
-        date: map['date'],
-      );
-  */
 }
