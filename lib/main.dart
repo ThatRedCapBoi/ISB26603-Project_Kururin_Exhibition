@@ -1,12 +1,13 @@
 import 'package:Project_Kururin_Exhibition/pages/homePage.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart'; // Import Firebase Core
 
 import "common/theme.dart";
 
-import 'package:Project_Kururin_Exhibition/pages/demo.dart';
-
-void main() {
+// Make main an async function
+void main() async { // Add 'async' keyword here
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(); // Initialize Firebase here
   runApp(const MainApp());
 }
 
