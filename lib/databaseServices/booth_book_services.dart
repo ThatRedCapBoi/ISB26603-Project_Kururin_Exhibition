@@ -1,4 +1,4 @@
-import 'package:path/path.dart';
+/* import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 // import 'package:Project_Kururin_Exhibition/models/booth_book.dart';
@@ -42,4 +42,4 @@ class BoothBookServices {
     );
     return database;
   }
-}
+} */
