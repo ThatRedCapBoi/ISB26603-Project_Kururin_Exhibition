@@ -97,7 +97,7 @@ class _BookingListPageState extends State<BookingListPage> {
           NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
           NavigationDestination(
             icon: Icon(Icons.book_online),
-            label: 'Bookings',
+            label: 'Booking',
           ),
           NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
         ],

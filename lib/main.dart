@@ -1,3 +1,4 @@
+import 'package:Project_Kururin_Exhibition/pages/homePage.dart';
 import 'package:flutter/material.dart';
 
 import "common/theme.dart";
@@ -17,7 +18,8 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Kururin Exhibition',
       theme: appTheme,
-      home: const demoHomePage(title: ' Kururin Exhibition - Sitemap Demo'),
+      // home: const demoHomePage(title: ' Kururin Exhibition - Sitemap Demo'),
+      home: HomePage(),
     );
   }
 }

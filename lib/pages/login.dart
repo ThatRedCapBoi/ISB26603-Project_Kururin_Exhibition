@@ -1,9 +1,13 @@
 // import 'package:sqflite/sqflite.dart';
 import 'package:flutter/material.dart';
+
 import 'package:Project_Kururin_Exhibition/databaseServices/eventSphere_db.dart';
+import 'package:Project_Kururin_Exhibition/models/admin.dart';
+
 import 'package:Project_Kururin_Exhibition/pages/user/userProfile.dart';
 import 'package:Project_Kururin_Exhibition/pages/registration.dart';
 import 'package:Project_Kururin_Exhibition/pages/user/userHome.dart';
+import 'package:Project_Kururin_Exhibition/pages/admin/adminHome.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -50,6 +54,16 @@ class _LoginPageState extends State<LoginPage> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => UserHomePage(user: u)),
+        );
+      } else if (email == 'admin@user.com' && pw == 'admin') {
+        // Admin login
+        final admin = Admin(id: 1, name: 'Admin', email: email, password: pw);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Admin login successful!')),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => AdminHomePage(admin: admin)),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
