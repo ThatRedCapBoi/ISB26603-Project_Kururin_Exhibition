@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-
 import 'package:Project_Kururin_Exhibition/models/admin.dart';
-
 import 'package:Project_Kururin_Exhibition/pages/homePage.dart';
-
 import 'package:Project_Kururin_Exhibition/pages/admin/adminNavigation.dart';
 
 class AdminProfilePage extends StatefulWidget {
