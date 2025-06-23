@@ -2,15 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:Project_Kururin_Exhibition/databaseServices/eventSphere_db.dart';
 import 'package:Project_Kururin_Exhibition/models/booth_book.dart';
 
+import 'package:Project_Kururin_Exhibition/models/users.dart';
+
 class BookingFormPage extends StatefulWidget {
-  final String userEmail;
+  final User user;
   final Booking? existingBooking;
 
-  const BookingFormPage({
-    super.key,
-    required this.userEmail,
-    this.existingBooking,
-  });
+  const BookingFormPage({super.key, required this.user, this.existingBooking});
 
   @override
   State<BookingFormPage> createState() => _BookingFormPageState();
@@ -79,7 +77,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
     if (_formKey.currentState!.validate()) {
       final booking = Booking(
         bookID: widget.existingBooking?.bookID,
-        userEmail: widget.userEmail,
+        userEmail: widget.user.email,
         boothType: _boothCtrl.text.trim(),
         date: _dateCtrl.text.trim(),
         additionalItems: _selectedItems,

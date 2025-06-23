@@ -1,20 +1,21 @@
-import 'package:Project_Kururin_Exhibition/models/users.dart';
 import 'package:Project_Kururin_Exhibition/pages/user/userBookingForm.dart';
 import 'package:flutter/material.dart';
 
 import 'package:Project_Kururin_Exhibition/models/booth.dart';
 import 'package:Project_Kururin_Exhibition/models/users.dart';
 
-import 'package:Project_Kururin_Exhibition/pages/login.dart';
+import 'package:Project_Kururin_Exhibition/pages/user/userNavigation.dart';
 
 class UserHomePage extends StatelessWidget {
-  final List<boothPackage> boothPackages = boothPackage.getBoothPackages();
   final User user;
 
-  UserHomePage({super.key, required this.user});
+  const UserHomePage({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
+    final List<boothPackage> boothPackages = boothPackage.getBoothPackages();
+    int selectedIndex = 0;
+
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
@@ -52,32 +53,22 @@ class UserHomePage extends StatelessWidget {
             ),
           ),
           SizedBox(height: 16),
-          // Display all booth cards based on index
           boothCard(context, boothPackages[0]),
-          Padding(
-            padding: EdgeInsets.all(16),
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return BookingFormPage(userEmail: user.email);
-                    },
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).primaryColor,
-                foregroundColor: Colors.white,
-                padding: EdgeInsets.all(16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-              ),
-              child: Text('Book Now!', style: TextStyle(fontSize: 18)),
-            ),
+        ],
+      ),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: selectedIndex,
+        onDestinationSelected: (index) {
+          // Since this is stateless, you may want to use a callback or another state management solution
+          onUserDestinationSelected(context, index, user);
+        },
+        destinations: const [
+          NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
+          NavigationDestination(
+            icon: Icon(Icons.book_online),
+            label: 'Booking',
           ),
+          NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
     );

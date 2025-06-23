@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:Project_Kururin_Exhibition/models/users.dart';
 import 'package:Project_Kururin_Exhibition/databaseServices/eventSphere_db.dart';
-// import 'package:Project_Kururin_Exhibition/routes/app_routes.dart';
 
 import 'package:Project_Kururin_Exhibition/pages/login.dart';
 
+import 'package:Project_Kururin_Exhibition/pages/user/userNavigation.dart';
+
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+  final User user;
+  const ProfilePage({super.key, required this.user});
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
@@ -17,38 +19,35 @@ class _ProfilePageState extends State<ProfilePage> {
   final emailCtrl = TextEditingController();
   final phoneCtrl = TextEditingController();
   final pwCtrl = TextEditingController();
-  User? _user;
+
+  int _selectedIndex = 2;
 
   void _save() async {
     if (_form.currentState!.validate()) {
       final u = User(
-        id: _user?.id,
+        id: widget.user.id,
         name: nameCtrl.text.trim(),
         email: emailCtrl.text.trim(),
         phone: phoneCtrl.text.trim(),
         password: pwCtrl.text,
       );
-      if (_user == null) {
-        await EventSphereDB.instance.insertUser(u);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Registered')));
-      } else {
-        await EventSphereDB.instance.updateUser(u);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Updated')));
-      }
+      await EventSphereDB.instance.updateUser(u);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Updated')));
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const LoginPage()),
+        MaterialPageRoute(builder: (context) => LoginPage()),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Profile')),
+    appBar: AppBar(
+      title: const Text('Profile'),
+      automaticallyImplyLeading: false,
+    ),
     body: Padding(
       padding: const EdgeInsets.all(20),
       child: Form(
@@ -81,6 +80,20 @@ class _ProfilePageState extends State<ProfilePage> {
           ],
         ),
       ),
+    ),
+    bottomNavigationBar: NavigationBar(
+      selectedIndex: _selectedIndex,
+      onDestinationSelected: (index) {
+        setState(() {
+          _selectedIndex = index;
+        });
+        onUserDestinationSelected(context, index, widget.user);
+      },
+      destinations: const [
+        NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
+        NavigationDestination(icon: Icon(Icons.book_online), label: 'Booking'),
+        NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
+      ],
     ),
   );
 }

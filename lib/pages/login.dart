@@ -1,4 +1,4 @@
-import 'package:sqflite/sqflite.dart';
+// import 'package:sqflite/sqflite.dart';
 import 'package:flutter/material.dart';
 import 'package:Project_Kururin_Exhibition/databaseServices/eventSphere_db.dart';
 import 'package:Project_Kururin_Exhibition/pages/user/userProfile.dart';
@@ -111,16 +111,16 @@ class _LoginPageState extends State<LoginPage> {
                 ),
             child: const Text('Register Here'),
           ),
-          TextButton(
-            onPressed:
-                () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ProfilePage(),
-                  ), // Direct to profile for update
-                ),
-            child: const Text('Update Profile'),
-          ),
+          // TextButton(
+          //   onPressed:
+          //       () => Navigator.push(
+          //         context,
+          //         MaterialPageRoute(
+          //           builder: (context) => const ProfilePage(user: user),
+          //         ), // Direct to profile for update
+          //       ),
+          //   child: const Text('Update Profile'),
+          // ),
         ],
       ),
     ),

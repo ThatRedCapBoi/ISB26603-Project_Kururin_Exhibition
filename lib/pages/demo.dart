@@ -1,8 +1,10 @@
+import 'package:Project_Kururin_Exhibition/pages/user/userHome.dart';
 import 'package:flutter/material.dart';
 
 import 'package:Project_Kururin_Exhibition/widgets/components.dart';
 
 import 'package:Project_Kururin_Exhibition/models/admin.dart';
+import 'package:Project_Kururin_Exhibition/models/users.dart';
 
 import 'package:Project_Kururin_Exhibition/pages/homePage.dart';
 import 'package:Project_Kururin_Exhibition/pages/registration.dart';
@@ -26,6 +28,20 @@ class demoHomePage extends StatefulWidget {
 class _demoHomePageState extends State<demoHomePage> {
   @override
   Widget build(BuildContext context) {
+    final demoUser = User(
+      id: 1,
+      name: 'Demo User',
+      email: 'demo@user.com',
+      phone: '0123456789',
+      password: 'password',
+    );
+    final demoAdmin = Admin(
+      id: 1,
+      name: 'Demo Admin',
+      email: 'demo@admin.com',
+      password: '',
+    );
+
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
       backgroundColor: Color(0xFFFEFEFA),
@@ -54,6 +70,11 @@ class _demoHomePageState extends State<demoHomePage> {
               ),
               SizedBox(height: 16),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                  foregroundColor: Colors.white, // sets the text/icon color
+                  textStyle: const TextStyle(color: Colors.white),
+                ),
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -68,6 +89,11 @@ class _demoHomePageState extends State<demoHomePage> {
               ),
               SizedBox(height: 16),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                  foregroundColor: Colors.white, // sets the text/icon color
+                  textStyle: const TextStyle(color: Colors.white),
+                ),
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -82,6 +108,11 @@ class _demoHomePageState extends State<demoHomePage> {
               ),
               SizedBox(height: 16),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                  foregroundColor: Colors.white, // sets the text/icon color
+                  textStyle: const TextStyle(color: Colors.white),
+                ),
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -92,7 +123,7 @@ class _demoHomePageState extends State<demoHomePage> {
                     ),
                   );
                 },
-                child: Text("Login"),
+                child: const Text("Login"),
               ),
               ShortDivider(color: Theme.of(context).colorScheme.primary),
               Text(
@@ -103,16 +134,35 @@ class _demoHomePageState extends State<demoHomePage> {
                   color: Theme.of(context).colorScheme.primary,
                 ),
               ),
-
               SizedBox(height: 16),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                  foregroundColor: Colors.white, // sets the text/icon color
+                  textStyle: const TextStyle(color: Colors.white),
+                ),
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) {
-                        return ProfilePage();
-                      },
+                      builder: (context) => UserHomePage(user: demoUser),
+                    ),
+                  );
+                },
+                child: Text("User Home Page"),
+              ),
+              SizedBox(height: 16),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                  foregroundColor: Colors.white, // sets the text/icon color
+                  textStyle: const TextStyle(color: Colors.white),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfilePage(user: demoUser),
                     ),
                   );
                 },
@@ -120,13 +170,16 @@ class _demoHomePageState extends State<demoHomePage> {
               ),
               SizedBox(height: 16),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                  foregroundColor: Colors.white, // sets the text/icon color
+                  textStyle: const TextStyle(color: Colors.white),
+                ),
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) {
-                        return BookingListPage(userEmail: 'test@mail.com');
-                      },
+                      builder: (context) => BookingListPage(user: demoUser),
                     ),
                   );
                 },
@@ -134,32 +187,22 @@ class _demoHomePageState extends State<demoHomePage> {
               ),
               SizedBox(height: 16),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                  foregroundColor: Colors.white, // sets the text/icon color
+                  textStyle: const TextStyle(color: Colors.white),
+                ),
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) {
-                        return BookingFormPage(userEmail: 'test@mail.com');
-                      },
+                      builder: (context) => BookingFormPage(user: demoUser),
                     ),
                   );
                 },
                 child: Text("Booth Booking Form"),
               ),
               SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) {
-                  //       return BoothBookingDetailPage();
-                  //     },
-                  //   ),
-                  // );
-                },
-                child: Text("Booth Booking Detail"),
-              ),
               ShortDivider(color: Theme.of(context).colorScheme.primary),
               Text(
                 'Administrator Environment',
@@ -171,18 +214,16 @@ class _demoHomePageState extends State<demoHomePage> {
               ),
               SizedBox(height: 16),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                  foregroundColor: Colors.white, // sets the text/icon color
+                  textStyle: const TextStyle(color: Colors.white),
+                ),
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) {
-                        // Replace with a valid Admin instance for demonstration
-                        Admin demoAdmin = Admin(
-                          id: 1,
-                          name: 'Demo Admin 2025',
-                          email: 'demo@admin.com',
-                          password: '',
-                        );
                         return AdminHomePage(admin: demoAdmin);
                       },
                     ),
@@ -190,6 +231,7 @@ class _demoHomePageState extends State<demoHomePage> {
                 },
                 child: Text("Admin Homepage"),
               ),
+              SizedBox(height: 16),
             ],
           ),
         ),

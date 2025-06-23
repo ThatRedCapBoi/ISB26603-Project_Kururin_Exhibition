@@ -1,4 +1,4 @@
-import 'package:sqflite/sqflite.dart';
+// import 'package:sqflite/sqflite.dart';
 import 'package:flutter/material.dart';
 import 'package:Project_Kururin_Exhibition/databaseServices/eventSphere_db.dart';
 import 'package:Project_Kururin_Exhibition/models/users.dart';
@@ -36,7 +36,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
     final String confirmPassword = confirmPwCtrl.text;
 
     // Basic client-side validation
-    if (name.isEmpty || email.isEmpty || phone.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+    if (name.isEmpty ||
+        email.isEmpty ||
+        phone.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all fields.')),
       );
@@ -47,9 +51,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
     }
 
     if (password != confirmPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Passwords do not match.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Passwords do not match.')));
       setState(() {
         _isLoading = false;
       });
@@ -61,7 +65,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
       final existingUser = await EventSphereDB.instance.getUserByEmail(email);
       if (existingUser != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Email already registered. Please login or use a different email.')),
+          const SnackBar(
+            content: Text(
+              'Email already registered. Please login or use a different email.',
+            ),
+          ),
         );
         setState(() {
           _isLoading = false;
@@ -76,7 +84,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
         password: password,
       );
 
-      final id = await EventSphereDB.instance.insertUser(newUser); // Capture the ID for logging/debugging
+      final id = await EventSphereDB.instance.insertUser(
+        newUser,
+      ); // Capture the ID for logging/debugging
       if (id > 0) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Registration successful!')),
@@ -89,14 +99,20 @@ class _RegistrationPageState extends State<RegistrationPage> {
       } else {
         // This 'else' block might hit if insertUser returns 0 (no rows affected)
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Registration failed. Please try again.')),
+          const SnackBar(
+            content: Text('Registration failed. Please try again.'),
+          ),
         );
       }
     } catch (e) {
       // Catch any unexpected errors during the registration process
       print('Registration error: $e'); // Print to console for debugging
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An error occurred during registration: ${e.toString()}')),
+        SnackBar(
+          content: Text(
+            'An error occurred during registration: ${e.toString()}',
+          ),
+        ),
       );
     } finally {
       setState(() {
@@ -138,7 +154,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       isPasswordVisible = !isPasswordVisible;
                     });
                   },
-                  icon: Icon(isPasswordVisible ? Icons.visibility : Icons.visibility_off),
+                  icon: Icon(
+                    isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                  ),
                 ),
               ),
             ),
@@ -153,7 +171,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       isPasswordVisible = !isPasswordVisible;
                     });
                   },
-                  icon: Icon(isPasswordVisible ? Icons.visibility : Icons.visibility_off),
+                  icon: Icon(
+                    isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                  ),
                 ),
               ),
             ),
@@ -161,14 +181,15 @@ class _RegistrationPageState extends State<RegistrationPage> {
             _isLoading
                 ? const CircularProgressIndicator() // Show loading indicator while processing
                 : ElevatedButton(
-                    onPressed: _register,
-                    child: const Text('Register'),
-                  ),
+                  onPressed: _register,
+                  child: const Text('Register'),
+                ),
             TextButton(
-              onPressed: () => Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const LoginPage()),
-              ),
+              onPressed:
+                  () => Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginPage()),
+                  ),
               child: const Text('Already have an account? Login'),
             ),
           ],
