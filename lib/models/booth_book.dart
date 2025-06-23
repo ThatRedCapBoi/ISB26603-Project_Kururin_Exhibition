@@ -14,18 +14,21 @@ class Booking {
   });
 
   Map<String, dynamic> toMap() => {
-        'bookID': bookID,
-        'userEmail': userEmail,
-        'boothType': boothType,
-        'additionalItems': additionalItems.join(','),
-        'date': date,
-      };
+    'bookID': bookID,
+    'userEmail': userEmail,
+    'boothType': boothType,
+    'additionalItems': additionalItems.join(','),
+    'date': date,
+  };
 
   factory Booking.fromMap(Map<String, dynamic> map) => Booking(
-        bookID: map['bookID'],
-        userEmail: map['userEmail'],
-        boothType: map['boothType'],
-        additionalItems: map['additionalItems'].split(','),
-        date: map['date'],
-      );
+    bookID: map['bookID'] as int?,
+    userEmail: map['userEmail'] as String? ?? '',
+    boothType: map['boothType'] as String? ?? '',
+    additionalItems:
+        (map['additionalItems'] as String? ?? '').isEmpty
+            ? []
+            : (map['additionalItems'] as String).split(','),
+    date: map['date'] as String? ?? '',
+  );
 }

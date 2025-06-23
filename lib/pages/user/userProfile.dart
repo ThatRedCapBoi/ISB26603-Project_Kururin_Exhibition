@@ -1,3 +1,4 @@
+import 'package:Project_Kururin_Exhibition/widgets/components.dart';
 import 'package:flutter/material.dart';
 import 'package:Project_Kururin_Exhibition/models/users.dart';
 import 'package:Project_Kururin_Exhibition/databaseServices/eventSphere_db.dart';
@@ -5,6 +6,8 @@ import 'package:Project_Kururin_Exhibition/databaseServices/eventSphere_db.dart'
 import 'package:Project_Kururin_Exhibition/pages/login.dart';
 
 import 'package:Project_Kururin_Exhibition/pages/user/userNavigation.dart';
+import 'package:Project_Kururin_Exhibition/pages/homepage.dart';
+import 'package:path/path.dart';
 
 class ProfilePage extends StatefulWidget {
   final User user;
@@ -33,10 +36,10 @@ class _ProfilePageState extends State<ProfilePage> {
       );
       await EventSphereDB.instance.updateUser(u);
       ScaffoldMessenger.of(
-        context,
+        context as BuildContext,
       ).showSnackBar(const SnackBar(content: Text('Updated')));
       Navigator.pushReplacement(
-        context,
+        context as BuildContext,
         MaterialPageRoute(builder: (context) => LoginPage()),
       );
     }
@@ -48,36 +51,59 @@ class _ProfilePageState extends State<ProfilePage> {
       title: const Text('Profile'),
       automaticallyImplyLeading: false,
     ),
-    body: Padding(
-      padding: const EdgeInsets.all(20),
-      child: Form(
-        key: _form,
-        child: ListView(
-          children: [
-            TextFormField(
-              controller: nameCtrl,
-              decoration: const InputDecoration(labelText: 'Name'),
-              validator: (v) => v!.isEmpty ? 'Enter name' : null,
-            ),
-            TextFormField(
-              controller: emailCtrl,
-              decoration: const InputDecoration(labelText: 'Email'),
-              validator: (v) => v!.isEmpty ? 'Enter email' : null,
-            ),
-            TextFormField(
-              controller: phoneCtrl,
-              decoration: const InputDecoration(labelText: 'Phone'),
-              validator: (v) => v!.isEmpty ? 'Enter phone' : null,
-            ),
-            TextFormField(
-              controller: pwCtrl,
-              decoration: const InputDecoration(labelText: 'Password'),
-              obscureText: true,
-              validator: (v) => v!.length < 6 ? 'Min 6 chars' : null,
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(onPressed: _save, child: const Text('Save')),
-          ],
+    body: Center(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Form(
+          key: _form,
+          child: StreamBuilder<Object>(
+            stream: null,
+            builder: (context, snapshot) {
+              return ListView(
+                children: [
+                  TextFormField(
+                    controller: nameCtrl,
+                    decoration: const InputDecoration(labelText: 'Name'),
+                    validator: (v) => v!.isEmpty ? 'Enter name' : null,
+                  ),
+                  TextFormField(
+                    controller: phoneCtrl,
+                    decoration: const InputDecoration(labelText: 'Phone'),
+                    validator: (v) => v!.isEmpty ? 'Enter phone' : null,
+                  ),
+                  TextFormField(
+                    controller: pwCtrl,
+                    decoration: const InputDecoration(labelText: 'Password'),
+                    obscureText: true,
+                    validator: (v) => v!.length < 6 ? 'Min 6 chars' : null,
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _save,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                    ),
+                    child: const Text('Save'),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return HomePage();
+                          },
+                        ),
+                      );
+                    },
+                    child: const Text('Logout'),
+                  ),
+                ],
+              );
+            },
+          ),
         ),
       ),
     ),

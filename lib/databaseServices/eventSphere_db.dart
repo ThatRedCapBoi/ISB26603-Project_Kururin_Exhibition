@@ -59,7 +59,11 @@ class EventSphereDB {
   Future<int> insertUser(User u) async {
     final db = await database;
     // Keys in u.toMap() ('id', 'name', 'email', 'phone', 'password') now directly match table columns
-    return await db.insert('users', u.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+    return await db.insert(
+      'users',
+      u.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   Future<User?> getUserByEmail(String email) async {
@@ -87,7 +91,10 @@ class EventSphereDB {
 
   Future<List<User>> getAllUsers() async {
     final db = await database;
-    final maps = await db.query('users');
+    final maps = await db.query(
+      'users',
+      columns: ['id', 'name', 'email', 'phone'],
+    );
     return maps.map((map) => User.fromMap(map)).toList();
   }
 
@@ -99,8 +106,12 @@ class EventSphereDB {
   // ---------- BOOKINGS (booth_book.dart) ----------
 
   Future<int> insertBooking(Booking b) async {
-    final db = await database; 
-    return await db.insert('bookings', b.toMap(),  conflictAlgorithm: ConflictAlgorithm.replace);
+    final db = await database;
+    return await db.insert(
+      'bookings',
+      b.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   Future<List<Booking>> getBookingsByUser(String email) async {
@@ -125,7 +136,20 @@ class EventSphereDB {
 
   Future<int> deleteBooking(int bookID) async {
     final db = await database;
-    return await db.delete('bookings', where: 'bookID = ?', whereArgs: [bookID]);
+    return await db.delete(
+      'bookings',
+      where: 'bookID = ?',
+      whereArgs: [bookID],
+    );
+  }
+
+  Future<List<Booking>> getAllBookings() async {
+    final db = await database;
+    final maps = await db.query(
+      'bookings',
+      columns: ['bookID', 'userEmail', 'boothType', 'additionalItems', 'date'],
+    );
+    return maps.map((map) => Booking.fromMap(map)).toList();
   }
 
   // ---------- ADMINS (admin.dart) ----------

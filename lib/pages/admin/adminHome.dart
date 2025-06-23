@@ -109,43 +109,61 @@ Widget adminTable(BuildContext context) {
         return const Text('No admins found.');
       } else {
         final admins = snapshot.data!;
-        return DataTable(
-          columns: const [
-            DataColumn(label: Text('ID')),
-            DataColumn(label: Text('Name')),
-            DataColumn(label: Text('Email')),
-            DataColumn(label: Text('')), // For trailing icon
-          ],
-          rows:
-              admins
-                  .map(
-                    (admin) => DataRow(
-                      cells: [
-                        DataCell(Text(admin.id?.toString() ?? '')),
-                        DataCell(Text(admin.name)),
-                        DataCell(Text(admin.email)),
-                        DataCell(
-                          IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            tooltip: 'Delete',
-                            onPressed: () async {
-                              if (admin.id != null) {
-                                await EventSphereDB.instance.deleteAdmin(
-                                  admin.id!,
-                                );
-                                // Refresh the table after deletion
-                                (context as Element).markNeedsBuild();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Admin deleted')),
-                                );
-                              }
-                            },
+        return SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: DataTable(
+            columnSpacing: 8.0, // Reduce spacing between columns
+            columns: const [
+              DataColumn(
+                label: Expanded(
+                  child: Text('ID', overflow: TextOverflow.ellipsis),
+                ),
+              ),
+              DataColumn(
+                label: Expanded(
+                  child: Text('Name', overflow: TextOverflow.ellipsis),
+                ),
+              ),
+              DataColumn(
+                label: Expanded(
+                  child: Text('Email', overflow: TextOverflow.ellipsis),
+                ),
+              ),
+              DataColumn(
+                label: SizedBox(width: 24), // For trailing icon
+              ),
+            ],
+            rows:
+                admins
+                    .map(
+                      (admin) => DataRow(
+                        cells: [
+                          DataCell(Text(admin.id?.toString() ?? '')),
+                          DataCell(Text(admin.name)),
+                          DataCell(Text(admin.email)),
+                          DataCell(
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              tooltip: 'Delete',
+                              onPressed: () async {
+                                if (admin.id != null) {
+                                  await EventSphereDB.instance.deleteAdmin(
+                                    admin.id!,
+                                  );
+                                  // Refresh the table after deletion
+                                  (context as Element).markNeedsBuild();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Admin deleted')),
+                                  );
+                                }
+                              },
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  )
-                  .toList(),
+                        ],
+                      ),
+                    )
+                    .toList(),
+          ),
         );
       }
     },

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import "common/theme.dart";
 
-import 'package:Project_Kururin_Exhibition/pages/demo.dart';
+// import 'package:Project_Kururin_Exhibition/pages/demo.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
