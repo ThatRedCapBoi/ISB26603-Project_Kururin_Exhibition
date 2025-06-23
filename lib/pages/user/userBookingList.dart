@@ -1,32 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:Project_Kururin_Exhibition/models/booth_book.dart'; // Make sure this model has toFirestore()
+import 'package:Project_Kururin_Exhibition/models/booth_book.dart';
 import 'package:Project_Kururin_Exhibition/models/users.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Added Firebase Firestore import
-import 'package:firebase_auth/firebase_auth.dart' as auth; // Added Firebase Auth import
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 
 class BookingListPage extends StatefulWidget {
   final User user;
-  final Booking? existingBooking;
+  final Booking? existingBooking; // This may not be used directly if this page only lists bookings
 
   const BookingListPage({super.key, required this.user, this.existingBooking});
 
   @override
-  State<BookingListPage> createState() => _BookingListPage();
+  State<BookingListPage> createState() => _BookingListPageState(); // Renamed state class for clarity
 }
 
-class _BookingListPage extends State<BookingListPage> {
+class _BookingListPageState extends State<BookingListPage> { // Renamed state class
   final _formKey = GlobalKey<FormState>();
-  final _boothCtrl = TextEditingController();
-  final _dateCtrl = TextEditingController();
+  // Corrected controller name
+  final TextEditingController _boothPackageIDCtrl = TextEditingController();
+  // Corrected controller name and added event time controller
+  final TextEditingController _eventDateCtrl = TextEditingController();
+  final TextEditingController _eventTimeCtrl = TextEditingController();
 
-  final List<String> _items = [
+
+  final List<String> _availableItems = [ // Renamed for clarity
     'Extra Chairs',
     'Extra Tables',
     'Lounge Seating',
     'Carpet',
     'Brochure Racks',
   ];
-  List<String> _selectedItems = [];
+  List<dynamic> _selectedItems = []; // Changed to dynamic to match model List<dynamic>
 
   bool get isEdit => widget.existingBooking != null;
 
@@ -34,16 +38,18 @@ class _BookingListPage extends State<BookingListPage> {
   void initState() {
     super.initState();
     if (widget.existingBooking != null) {
-      _boothCtrl.text = widget.existingBooking!.boothType;
-      _dateCtrl.text = widget.existingBooking!.date;
-      _selectedItems = List.from(widget.existingBooking!.additionalItems);
+      _boothPackageIDCtrl.text = widget.existingBooking!.boothPackageID; // Corrected field name
+      _eventDateCtrl.text = widget.existingBooking!.eventDate; // Corrected field name
+      _eventTimeCtrl.text = widget.existingBooking!.eventTime; // New field
+      _selectedItems = List.from(widget.existingBooking!.selectedAddItems); // Corrected field name
     }
   }
 
   @override
   void dispose() {
-    _boothCtrl.dispose();
-    _dateCtrl.dispose();
+    _boothPackageIDCtrl.dispose();
+    _eventDateCtrl.dispose();
+    _eventTimeCtrl.dispose();
     super.dispose();
   }
 
@@ -52,11 +58,23 @@ class _BookingListPage extends State<BookingListPage> {
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime.now(),
-      lastDate: DateTime(2026),
+      lastDate: DateTime(2101), // Increased last date
     );
     if (picked != null) {
       setState(() {
-        _dateCtrl.text = "${picked.day}/${picked.month}/${picked.year}";
+        _eventDateCtrl.text = "${picked.toLocal()}".split(' ')[0];
+      });
+    }
+  }
+
+  Future<void> _selectTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        _eventTimeCtrl.text = picked.format(context);
       });
     }
   }
@@ -81,23 +99,30 @@ class _BookingListPage extends State<BookingListPage> {
         return;
       }
 
+      // Default values for new required fields if not explicitly collected
+      final String bookingStatus = isEdit ? widget.existingBooking!.status : 'Pending';
+      final double calculatedTotalPrice = isEdit ? widget.existingBooking!.totalPrice : 0.0; // Placeholder
+      final String currentBookingDate = DateTime.now().toIso8601String().split('T')[0];
+
       final newBooking = Booking(
-        // For new bookings, bookID will be null and Firestore will generate one
-        // For updates, the existing bookID (Firestore Doc ID) is passed
-        bookID: widget.existingBooking?.bookID, // Assuming bookID stores Firestore doc ID
-        userEmail: user.email!, // Use current authenticated user's email
-        boothType: _boothCtrl.text.trim(),
-        additionalItems: _selectedItems,
-        date: _dateCtrl.text.trim(),
+        id: widget.existingBooking?.id, // Corrected to 'id'
+        userEmail: user.email!,
+        boothPackageID: _boothPackageIDCtrl.text.trim(), // Corrected field name
+        selectedAddItems: _selectedItems, // Corrected field name
+        bookingDate: currentBookingDate, // Booking creation date
+        eventDate: _eventDateCtrl.text.trim(), // Event date from form
+        eventTime: _eventTimeCtrl.text.trim(), // Event time from form
+        status: bookingStatus,
+        totalPrice: calculatedTotalPrice,
+        userID: widget.user.id!, // Assuming your User model has an 'id' field
       );
 
       try {
         if (isEdit) {
-          // Update existing booking in Firestore
-          if (newBooking.bookID != null) {
+          if (newBooking.id != null) { // Corrected to 'id'
             await FirebaseFirestore.instance
                 .collection('bookings')
-                .doc(newBooking.bookID) // Use the Firestore document ID
+                .doc(newBooking.id) // Corrected to 'id'
                 .update(newBooking.toFirestore());
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Booking Updated Successfully!')),
@@ -108,13 +133,12 @@ class _BookingListPage extends State<BookingListPage> {
             );
           }
         } else {
-          // Add new booking to Firestore
           await FirebaseFirestore.instance.collection('bookings').add(newBooking.toFirestore());
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Booking Submitted Successfully!')),
           );
         }
-        Navigator.pop(context, true); // Pop and indicate success
+        Navigator.pop(context, true);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error saving booking: ${e.toString()}')),
@@ -139,33 +163,50 @@ class _BookingListPage extends State<BookingListPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextFormField(
-                controller: _boothCtrl,
+                controller: _boothPackageIDCtrl, // Corrected controller name
                 decoration: const InputDecoration(
-                  labelText: 'Booth Type',
+                  labelText: 'Booth Package ID', // Updated label
                   border: OutlineInputBorder(),
                 ),
-                validator: (value) => value == null || value.trim().isEmpty ? 'Please enter booth type' : null,
+                validator: (value) => value == null || value.trim().isEmpty ? 'Please enter booth package ID' : null,
               ),
               const SizedBox(height: 24),
               TextFormField(
-                controller: _dateCtrl,
+                controller: _eventDateCtrl, // Corrected controller name
                 readOnly: true,
                 decoration: InputDecoration(
-                  labelText: 'Booking Date',
+                  labelText: 'Event Date', // Updated label
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.calendar_today),
                     onPressed: () => _selectDate(context),
                   ),
                 ),
-                validator: (value) => value == null || value.trim().isEmpty ? 'Please select a date' : null,
+                validator: (value) => value == null || value.trim().isEmpty ? 'Please select an event date' : null,
+              ),
+              const SizedBox(height: 24),
+              TextFormField(
+                controller: _eventTimeCtrl, // New controller for time
+                readOnly: true,
+                decoration: InputDecoration(
+                  labelText: 'Event Time', // New label
+                  border: const OutlineInputBorder(),
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.access_time),
+                    onPressed: () => _selectTime(context),
+                  ),
+                ),
+                validator: (value) =>
+                    value == null || value.trim().isEmpty
+                        ? 'Please select an event time'
+                        : null,
               ),
               const SizedBox(height: 24),
               const Text(
                 "Select Additional Items:",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              ..._items.map((item) {
+              ..._availableItems.map((item) { // Corrected list name
                 return CheckboxListTile(
                   title: Text(item),
                   value: _selectedItems.contains(item),
