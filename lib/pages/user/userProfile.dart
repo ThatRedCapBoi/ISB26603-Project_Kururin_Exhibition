@@ -4,10 +4,12 @@ import 'package:Project_Kururin_Exhibition/models/users.dart';
 import 'package:Project_Kururin_Exhibition/pages/login.dart';
 import 'package:Project_Kururin_Exhibition/pages/user/userNavigation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Add this import
-import 'package:firebase_auth/firebase_auth.dart' as auth; // Alias for FirebaseAuth
+import 'package:firebase_auth/firebase_auth.dart'
+    as auth; // Alias for FirebaseAuth
 
 class ProfilePage extends StatefulWidget {
-  final User user; // This refers to your custom User model from models/users.dart
+  final User
+  user; // This refers to your custom User model from models/users.dart
   const ProfilePage({super.key, required this.user});
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -54,7 +56,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
       if (firebaseUser == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No authenticated user found. Please log in again.')),
+          const SnackBar(
+            content: Text('No authenticated user found. Please log in again.'),
+          ),
         );
         // setState(() { _isLoading = false; }); // Turn off loading if any
         return;
@@ -65,7 +69,9 @@ class _ProfilePageState extends State<ProfilePage> {
         if (pwCtrl.text.isNotEmpty) {
           if (pwCtrl.text.length < 6) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Password must be at least 6 characters long.')),
+              const SnackBar(
+                content: Text('Password must be at least 6 characters long.'),
+              ),
             );
             // setState(() { _isLoading = false; });
             return;
@@ -99,20 +105,24 @@ class _ProfilePageState extends State<ProfilePage> {
         // or guide them to re-login to ensure the auth token is updated.
         // For simplicity, we'll just pop for now.
         Navigator.pop(context); // Pop back after successful save
-
       } on auth.FirebaseAuthException catch (e) {
         String message = 'Failed to update profile. ';
         if (e.code == 'requires-recent-login') {
-          message += 'Please re-authenticate by logging in again to update sensitive fields (like email/password).';
+          message +=
+              'Please re-authenticate by logging in again to update sensitive fields (like email/password).';
         } else {
           message += e.message ?? 'An unknown authentication error occurred.';
         }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
       } on FirebaseException catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to update profile in Firestore: ${e.message}')),
+          SnackBar(
+            content: Text(
+              'Failed to update profile in Firestore: ${e.message}',
+            ),
+          ),
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -129,6 +139,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Profile'),
+        automaticallyImplyLeading: false,
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
       ),
@@ -162,9 +173,15 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               TextFormField(
                 controller: pwCtrl,
-                decoration: const InputDecoration(labelText: 'New Password (leave blank to keep current)'),
+                decoration: const InputDecoration(
+                  labelText: 'New Password (leave blank to keep current)',
+                ),
                 obscureText: true,
-                validator: (v) => v!.isNotEmpty && v.length < 6 ? 'Min 6 chars for new password' : null,
+                validator:
+                    (v) =>
+                        v!.isNotEmpty && v.length < 6
+                            ? 'Min 6 chars for new password'
+                            : null,
               ),
               const SizedBox(height: 20),
               ElevatedButton(onPressed: _save, child: const Text('Save')),
@@ -182,7 +199,10 @@ class _ProfilePageState extends State<ProfilePage> {
         },
         destinations: const [
           NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-          NavigationDestination(icon: Icon(Icons.book_online), label: 'Booking'),
+          NavigationDestination(
+            icon: Icon(Icons.book_online),
+            label: 'Booking',
+          ),
           NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),

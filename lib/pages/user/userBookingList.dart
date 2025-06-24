@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:Project_Kururin_Exhibition/models/booth_book.dart';
 import 'package:Project_Kururin_Exhibition/models/users.dart';
+import 'package:Project_Kururin_Exhibition/pages/user/userNavigation.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 
 class BookingListPage extends StatefulWidget {
   final User user;
-  final Booking? existingBooking; // This may not be used directly if this page only lists bookings
+  final Booking?
+  existingBooking; // This may not be used directly if this page only lists bookings
 
   const BookingListPage({super.key, required this.user, this.existingBooking});
 
@@ -14,7 +17,9 @@ class BookingListPage extends StatefulWidget {
   State<BookingListPage> createState() => _BookingListPageState(); // Renamed state class for clarity
 }
 
-class _BookingListPageState extends State<BookingListPage> { // Renamed state class
+class _BookingListPageState extends State<BookingListPage> {
+  // Renamed state class
+  int _selectedIndex = 1;
   final _formKey = GlobalKey<FormState>();
   // Corrected controller name
   final TextEditingController _boothPackageIDCtrl = TextEditingController();
@@ -22,15 +27,16 @@ class _BookingListPageState extends State<BookingListPage> { // Renamed state cl
   final TextEditingController _eventDateCtrl = TextEditingController();
   final TextEditingController _eventTimeCtrl = TextEditingController();
 
-
-  final List<String> _availableItems = [ // Renamed for clarity
+  final List<String> _availableItems = [
+    // Renamed for clarity
     'Extra Chairs',
     'Extra Tables',
     'Lounge Seating',
     'Carpet',
     'Brochure Racks',
   ];
-  List<dynamic> _selectedItems = []; // Changed to dynamic to match model List<dynamic>
+  List<dynamic> _selectedItems =
+      []; // Changed to dynamic to match model List<dynamic>
 
   bool get isEdit => widget.existingBooking != null;
 
@@ -38,10 +44,14 @@ class _BookingListPageState extends State<BookingListPage> { // Renamed state cl
   void initState() {
     super.initState();
     if (widget.existingBooking != null) {
-      _boothPackageIDCtrl.text = widget.existingBooking!.boothPackageID; // Corrected field name
-      _eventDateCtrl.text = widget.existingBooking!.eventDate; // Corrected field name
+      _boothPackageIDCtrl.text =
+          widget.existingBooking!.boothPackageID; // Corrected field name
+      _eventDateCtrl.text =
+          widget.existingBooking!.eventDate; // Corrected field name
       _eventTimeCtrl.text = widget.existingBooking!.eventTime; // New field
-      _selectedItems = List.from(widget.existingBooking!.selectedAddItems); // Corrected field name
+      _selectedItems = List.from(
+        widget.existingBooking!.selectedAddItems,
+      ); // Corrected field name
     }
   }
 
@@ -94,15 +104,20 @@ class _BookingListPageState extends State<BookingListPage> { // Renamed state cl
       final user = auth.FirebaseAuth.instance.currentUser;
       if (user == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('User not logged in. Cannot save booking.')),
+          const SnackBar(
+            content: Text('User not logged in. Cannot save booking.'),
+          ),
         );
         return;
       }
 
       // Default values for new required fields if not explicitly collected
-      final String bookingStatus = isEdit ? widget.existingBooking!.status : 'Pending';
-      final double calculatedTotalPrice = isEdit ? widget.existingBooking!.totalPrice : 0.0; // Placeholder
-      final String currentBookingDate = DateTime.now().toIso8601String().split('T')[0];
+      final String bookingStatus =
+          isEdit ? widget.existingBooking!.status : 'Pending';
+      final double calculatedTotalPrice =
+          isEdit ? widget.existingBooking!.totalPrice : 0.0; // Placeholder
+      final String currentBookingDate =
+          DateTime.now().toIso8601String().split('T')[0];
 
       final newBooking = Booking(
         id: widget.existingBooking?.id, // Corrected to 'id'
@@ -119,7 +134,8 @@ class _BookingListPageState extends State<BookingListPage> { // Renamed state cl
 
       try {
         if (isEdit) {
-          if (newBooking.id != null) { // Corrected to 'id'
+          if (newBooking.id != null) {
+            // Corrected to 'id'
             await FirebaseFirestore.instance
                 .collection('bookings')
                 .doc(newBooking.id) // Corrected to 'id'
@@ -133,7 +149,9 @@ class _BookingListPageState extends State<BookingListPage> { // Renamed state cl
             );
           }
         } else {
-          await FirebaseFirestore.instance.collection('bookings').add(newBooking.toFirestore());
+          await FirebaseFirestore.instance
+              .collection('bookings')
+              .add(newBooking.toFirestore());
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Booking Submitted Successfully!')),
           );
@@ -153,6 +171,7 @@ class _BookingListPageState extends State<BookingListPage> { // Renamed state cl
     return Scaffold(
       appBar: AppBar(
         title: Text(isEdit ? 'Edit Booking' : 'New Booking'),
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.deepPurple,
       ),
       body: SingleChildScrollView(
@@ -168,7 +187,11 @@ class _BookingListPageState extends State<BookingListPage> { // Renamed state cl
                   labelText: 'Booth Package ID', // Updated label
                   border: OutlineInputBorder(),
                 ),
-                validator: (value) => value == null || value.trim().isEmpty ? 'Please enter booth package ID' : null,
+                validator:
+                    (value) =>
+                        value == null || value.trim().isEmpty
+                            ? 'Please enter booth package ID'
+                            : null,
               ),
               const SizedBox(height: 24),
               TextFormField(
@@ -182,7 +205,11 @@ class _BookingListPageState extends State<BookingListPage> { // Renamed state cl
                     onPressed: () => _selectDate(context),
                   ),
                 ),
-                validator: (value) => value == null || value.trim().isEmpty ? 'Please select an event date' : null,
+                validator:
+                    (value) =>
+                        value == null || value.trim().isEmpty
+                            ? 'Please select an event date'
+                            : null,
               ),
               const SizedBox(height: 24),
               TextFormField(
@@ -196,17 +223,19 @@ class _BookingListPageState extends State<BookingListPage> { // Renamed state cl
                     onPressed: () => _selectTime(context),
                   ),
                 ),
-                validator: (value) =>
-                    value == null || value.trim().isEmpty
-                        ? 'Please select an event time'
-                        : null,
+                validator:
+                    (value) =>
+                        value == null || value.trim().isEmpty
+                            ? 'Please select an event time'
+                            : null,
               ),
               const SizedBox(height: 24),
               const Text(
                 "Select Additional Items:",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              ..._availableItems.map((item) { // Corrected list name
+              ..._availableItems.map((item) {
+                // Corrected list name
                 return CheckboxListTile(
                   title: Text(item),
                   value: _selectedItems.contains(item),
@@ -222,6 +251,23 @@ class _BookingListPageState extends State<BookingListPage> { // Renamed state cl
             ],
           ),
         ),
+      ),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _selectedIndex,
+        onDestinationSelected: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+          onUserDestinationSelected(context, index, widget.user);
+        },
+        destinations: const [
+          NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
+          NavigationDestination(
+            icon: Icon(Icons.book_online),
+            label: 'Booking',
+          ),
+          NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
+        ],
       ),
     );
   }
