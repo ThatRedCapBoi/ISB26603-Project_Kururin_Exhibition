@@ -1,3 +1,4 @@
+import 'package:Project_Kururin_Exhibition/pages/homepage.dart';
 import 'package:Project_Kururin_Exhibition/widgets/components.dart';
 import 'package:flutter/material.dart';
 import 'package:Project_Kururin_Exhibition/models/users.dart';
@@ -142,9 +143,24 @@ class _ProfilePageState extends State<ProfilePage> {
         automaticallyImplyLeading: false,
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Logout',
+            onPressed: () async {
+              await auth.FirebaseAuth.instance.signOut();
+              if (mounted) {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => HomePage()),
+                  (route) => false,
+                );
+              }
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Form(
           key: _form,
           child: Column(
