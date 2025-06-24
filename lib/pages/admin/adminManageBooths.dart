@@ -41,10 +41,7 @@ class _AdminManageBoothsPageState extends State<AdminManageBoothsPage> {
     }
   }
 
-  // Function to show an edit dialog or navigate to an edit form
   void _editBooth(BoothPackage booth) {
-    // You can either open a dialog or navigate to a dedicated edit page.
-    // For simplicity, let's open a dialog for editing.
     showDialog(
       context: context,
       builder: (context) => _EditBoothDialog(booth: booth),

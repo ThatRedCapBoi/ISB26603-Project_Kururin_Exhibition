@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:Project_Kururin_Exhibition/models/admin.dart';
 import 'package:Project_Kururin_Exhibition/pages/admin/adminHome.dart';
-import 'package:Project_Kururin_Exhibition/pages/admin/adminDashboard.dart';
+import 'package:Project_Kururin_Exhibition/pages/admin/adminManageUsers.dart';
 import 'package:Project_Kururin_Exhibition/pages/admin/adminBooking.dart';
 import 'package:Project_Kururin_Exhibition/pages/admin/adminProfile.dart';
 

@@ -40,7 +40,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
           ),
         ],
       ),
-      backgroundColor: const Color(0xFFFEFEFA),
+      // backgroundColor: const Color(0xFFFEFEFA),
       body: Center(
         child: Column(
           children: <Widget>[

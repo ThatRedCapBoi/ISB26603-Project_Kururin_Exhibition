@@ -1,9 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:Project_Kururin_Exhibition/models/admin.dart';
 import 'package:Project_Kururin_Exhibition/models/users.dart'
     as my_models; // Alias to avoid conflict with FirebaseAuth.User
 import 'package:Project_Kururin_Exhibition/pages/admin/adminNavigation.dart'; // Assuming this provides onAdminDestinationSelected
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AdminDashboard extends StatefulWidget {
   final Admin admin;
@@ -26,8 +27,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
       ),
-      backgroundColor: const Color(0xFFFEFEFA),
-      // Change from Center to Align for left alignment
+      // backgroundColor: const Color(0xFFFEFEFA),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Column(
@@ -152,11 +152,22 @@ class _userTableState extends State<_userTable> {
                         .map(
                           (user) => DataRow(
                             cells: [
-                              DataCell(Text(user.id?.toString() ?? 'N/A')),
                               DataCell(
-                                Text(
-                                  user.name,
-                                  overflow: TextOverflow.ellipsis,
+                                SizedBox(
+                                  width: 120, // Increased width for more space
+                                  child: Text(
+                                    user.id?.toString() ?? 'N/A',
+                                    overflow: TextOverflow.visible,
+                                  ),
+                                ),
+                              ),
+                              DataCell(
+                                SizedBox(
+                                  width: 90,
+                                  child: Text(
+                                    user.name,
+                                    overflow: TextOverflow.visible,
+                                  ),
                                 ),
                               ),
                               DataCell(

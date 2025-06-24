@@ -22,7 +22,7 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
         title: const Text('EventSphere Admin Dashboard'),
         automaticallyImplyLeading: false,
       ),
-      backgroundColor: const Color(0xFFFEFEFA),
+      // backgroundColor: const Color(0xFFFEFEFA),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

@@ -1,3 +1,4 @@
+import 'package:Project_Kururin_Exhibition/pages/admin/adminManageBookings.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:Project_Kururin_Exhibition/pages/admin/adminNavigation.dart';
@@ -8,7 +9,7 @@ import 'package:Project_Kururin_Exhibition/models/users.dart';
 import 'package:Project_Kururin_Exhibition/models/booth.dart';
 import 'package:Project_Kururin_Exhibition/models/additionalItems.dart';
 import 'package:Project_Kururin_Exhibition/pages/admin/adminAddBooth.dart';
-import 'package:Project_Kururin_Exhibition/pages/admin/adminManageBoothsPage.dart';
+import 'package:Project_Kururin_Exhibition/pages/admin/adminManageBooths.dart';
 
 class AdminBookingPage extends StatefulWidget {
   final Admin admin;
@@ -29,7 +30,7 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
         title: const Text('EventSphere Admin Dashboard'),
         automaticallyImplyLeading: false,
       ),
-      backgroundColor: const Color(0xFFFEFEFA),
+      // backgroundColor: const Color(0xFFFEFEFA),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Column(
@@ -44,7 +45,7 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
               ),
               textAlign: TextAlign.left,
             ),
-            Expanded(child: boothBookingTable(context)),
+            Expanded(child: _boothBookingTable(admin: widget.admin)),
           ],
         ),
       ),
@@ -73,7 +74,8 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
 }
 
 class _boothBookingTable extends StatefulWidget {
-  const _boothBookingTable({super.key});
+  final Admin admin;
+  const _boothBookingTable({super.key, required this.admin});
 
   @override
   State<_boothBookingTable> createState() => _boothBookingTableState();
@@ -256,6 +258,7 @@ class _boothBookingTableState extends State<_boothBookingTable> {
                         icon: const Icon(Icons.edit),
                         onPressed: () async {
                           User? user;
+                          Admin? admin;
                           if (booking.userID.isNotEmpty) {
                             try {
                               DocumentSnapshot userDoc =
@@ -292,8 +295,9 @@ class _boothBookingTableState extends State<_boothBookingTable> {
                               context,
                               MaterialPageRoute(
                                 builder:
-                                    (_) => BookingFormPage(
-                                      user: user!,
+                                    (_) => AdminBookingFormPage(
+                                      // user: user!,
+                                      admin: widget.admin,
                                       existingBooking: booking,
                                     ),
                               ),
@@ -331,8 +335,8 @@ class _boothBookingTableState extends State<_boothBookingTable> {
   }
 }
 
-Widget boothBookingTable(BuildContext context) {
-  return const _boothBookingTable();
+Widget boothBookingTable(BuildContext context, {required Admin admin}) {
+  return _boothBookingTable(admin: admin);
 }
 
 void showBoothManagementOptions(BuildContext context) {
