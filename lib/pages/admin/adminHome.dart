@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:Project_Kururin_Exhibition/pages/admin/adminNavigation.dart';
 import 'package:Project_Kururin_Exhibition/models/admin.dart';
-import 'package:Project_Kururin_Exhibition/pages/login.dart'; // For logout functionality
+import 'package:Project_Kururin_Exhibition/pages/homepage.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart'; // Add this import
 import 'package:firebase_auth/firebase_auth.dart'; // Add this import
 
@@ -21,16 +22,17 @@ class _AdminHomePageState extends State<AdminHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('EventSphere Admin Dashboard'), // More specific title
+        title: const Text('EventSphere Admin Dashboard'),
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.deepPurple, // Added a color for consistency
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
             icon: const Icon(Icons.logout, color: Colors.white),
             onPressed: () async {
               await FirebaseAuth.instance.signOut();
               Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const LoginPage()),
+                MaterialPageRoute(builder: (context) => const HomePage()),
                 (Route<dynamic> route) => false,
               );
             },
@@ -41,7 +43,6 @@ class _AdminHomePageState extends State<AdminHomePage> {
       backgroundColor: const Color(0xFFFEFEFA),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             SizedBox(height: 16),
             Text(
@@ -151,7 +152,7 @@ class _AdminTableState extends State<_AdminTable> {
                         cells: [
                           DataCell(
                             SizedBox(
-                              width: 120,
+                              width: 90,
                               child: Text(
                                 admin.id,
                                 softWrap: true,
@@ -161,7 +162,7 @@ class _AdminTableState extends State<_AdminTable> {
                           ), // Display UID
                           DataCell(
                             SizedBox(
-                              width: 100,
+                              width: 80,
                               child: Text(admin.name, softWrap: true),
                             ),
                           ),

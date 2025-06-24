@@ -30,7 +30,7 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
             Text(
               'Admin Profile Page',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.primary,
               ),

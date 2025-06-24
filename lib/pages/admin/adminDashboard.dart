@@ -54,27 +54,30 @@ class _AdminDashboardState extends State<AdminDashboard> {
       appBar: AppBar(
         title: const Text('EventSphere Admin Dashboard'),
         automaticallyImplyLeading: false,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Colors.white,
       ),
       backgroundColor: const Color(0xFFFEFEFA),
-      body: Center(
+      // Change from Center to Align for left alignment
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            SizedBox(height: 16),
+          crossAxisAlignment:
+              CrossAxisAlignment.start, // Ensure children align left
+          children: [
             Text(
               'User Management Page',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.primary,
               ),
+              textAlign: TextAlign.left,
             ),
-            const SizedBox(height: 24),
             // Use StreamBuilder for real-time updates of user list
             Expanded(
               child: StreamBuilder<List<my_models.User>>(
-                stream:
-                    _usersStream(), // Use a stream to listen for real-time changes
+                stream: _usersStream(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
@@ -87,10 +90,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     return SingleChildScrollView(
                       scrollDirection: Axis.vertical,
                       child: SingleChildScrollView(
-                        scrollDirection:
-                            Axis.horizontal, // Allow horizontal scrolling for wide tables
+                        scrollDirection: Axis.horizontal,
                         child: DataTable(
-                          columnSpacing: 8.0, // Reduce spacing between columns
+                          columnSpacing: 8.0,
                           columns: const [
                             DataColumn(
                               label: Expanded(
@@ -124,9 +126,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                 ),
                               ),
                             ),
-                            DataColumn(
-                              label: SizedBox(width: 24), // For trailing icon
-                            ),
+                            DataColumn(label: SizedBox(width: 24)),
                           ],
                           rows:
                               users
@@ -135,7 +135,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                       cells: [
                                         DataCell(
                                           Text(user.id?.toString() ?? 'N/A'),
-                                        ), // Display Firestore document ID
+                                        ),
                                         DataCell(
                                           Text(
                                             user.name,
@@ -163,9 +163,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                             tooltip: 'Delete',
                                             onPressed: () {
                                               if (user.id != null) {
-                                                _deleteUser(
-                                                  user.id!,
-                                                ); // Call the direct delete function
+                                                _deleteUser(user.id!);
                                               } else {
                                                 _showSnackBar(
                                                   'User ID is missing.',

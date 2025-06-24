@@ -192,18 +192,20 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
         automaticallyImplyLeading: false,
       ),
       backgroundColor: const Color(0xFFFEFEFA),
-      body: Center(
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment:
+              CrossAxisAlignment.start, // Ensure children align left
           children: <Widget>[
-            const SizedBox(height: 16),
             Text(
               'Booth Booking Management ',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.primary,
               ),
+              textAlign: TextAlign.left,
             ),
             Expanded(child: boothBookingCardList(context)),
           ],
