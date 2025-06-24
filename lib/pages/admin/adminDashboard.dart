@@ -17,6 +17,63 @@ class AdminDashboard extends StatefulWidget {
 class _AdminDashboardState extends State<AdminDashboard> {
   int _selectedIndex = 1;
 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('EventSphere Admin Dashboard'),
+        automaticallyImplyLeading: false,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Colors.white,
+      ),
+      backgroundColor: const Color(0xFFFEFEFA),
+      // Change from Center to Align for left alignment
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        child: Column(
+          crossAxisAlignment:
+              CrossAxisAlignment.start, // Ensure children align left
+          children: [
+            Text(
+              'User Management Page',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              textAlign: TextAlign.left,
+            ),
+            Expanded(
+              child: usertable(context), // Call the usertable function
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _selectedIndex,
+        onDestinationSelected: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+          onAdminDestinationSelected(context, index, widget.admin);
+        },
+        destinations: const [
+          NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
+          NavigationDestination(icon: Icon(Icons.dashboard), label: 'Users'),
+          NavigationDestination(icon: Icon(Icons.event), label: 'Bookings'),
+          NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
+        ],
+      ),
+    );
+  }
+}
+
+class _userTable extends StatefulWidget {
+  @override
+  State<_userTable> createState() => _userTableState();
+}
+
+class _userTableState extends State<_userTable> {
   // Helper function to show a SnackBar message
   void _showSnackBar(String message, {Color? backgroundColor}) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -50,159 +107,102 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('EventSphere Admin Dashboard'),
-        automaticallyImplyLeading: false,
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Colors.white,
-      ),
-      backgroundColor: const Color(0xFFFEFEFA),
-      // Change from Center to Align for left alignment
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start, // Ensure children align left
-          children: [
-            Text(
-              'User Management Page',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              textAlign: TextAlign.left,
-            ),
-            // Use StreamBuilder for real-time updates of user list
-            Expanded(
-              child: StreamBuilder<List<my_models.User>>(
-                stream: _usersStream(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(child: Text('No users found.'));
-                  } else {
-                    final users = snapshot.data!;
-                    return SingleChildScrollView(
-                      scrollDirection: Axis.vertical,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: DataTable(
-                          columnSpacing: 8.0,
-                          columns: const [
-                            DataColumn(
-                              label: Expanded(
-                                child: Text(
-                                  'ID',
+    return StreamBuilder<List<my_models.User>>(
+      stream: _usersStream(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text('No users found.'));
+        } else {
+          final users = snapshot.data!;
+          return SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: DataTable(
+                columnSpacing: 8.0,
+                columns: const [
+                  DataColumn(
+                    label: Expanded(
+                      child: Text('ID', overflow: TextOverflow.ellipsis),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Expanded(
+                      child: Text('Name', overflow: TextOverflow.ellipsis),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Expanded(
+                      child: Text('Email', overflow: TextOverflow.ellipsis),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Expanded(
+                      child: Text('Phone', overflow: TextOverflow.ellipsis),
+                    ),
+                  ),
+                  DataColumn(label: SizedBox(width: 24)),
+                ],
+                rows:
+                    users
+                        .map(
+                          (user) => DataRow(
+                            cells: [
+                              DataCell(Text(user.id?.toString() ?? 'N/A')),
+                              DataCell(
+                                Text(
+                                  user.name,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                            ),
-                            DataColumn(
-                              label: Expanded(
-                                child: Text(
-                                  'Name',
+                              DataCell(
+                                Text(
+                                  user.email,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                            ),
-                            DataColumn(
-                              label: Expanded(
-                                child: Text(
-                                  'Email',
+                              DataCell(
+                                Text(
+                                  user.phone,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                            ),
-                            DataColumn(
-                              label: Expanded(
-                                child: Text(
-                                  'Phone',
-                                  overflow: TextOverflow.ellipsis,
+                              DataCell(
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                  ),
+                                  tooltip: 'Delete',
+                                  onPressed: () {
+                                    if (user.id != null) {
+                                      _deleteUser(user.id!);
+                                    } else {
+                                      _showSnackBar(
+                                        'User ID is missing.',
+                                        backgroundColor: Colors.orange,
+                                      );
+                                    }
+                                  },
                                 ),
                               ),
-                            ),
-                            DataColumn(label: SizedBox(width: 24)),
-                          ],
-                          rows:
-                              users
-                                  .map(
-                                    (user) => DataRow(
-                                      cells: [
-                                        DataCell(
-                                          Text(user.id?.toString() ?? 'N/A'),
-                                        ),
-                                        DataCell(
-                                          Text(
-                                            user.name,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                        DataCell(
-                                          Text(
-                                            user.email,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                        DataCell(
-                                          Text(
-                                            user.phone,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                        DataCell(
-                                          IconButton(
-                                            icon: const Icon(
-                                              Icons.delete,
-                                              color: Colors.red,
-                                            ),
-                                            tooltip: 'Delete',
-                                            onPressed: () {
-                                              if (user.id != null) {
-                                                _deleteUser(user.id!);
-                                              } else {
-                                                _showSnackBar(
-                                                  'User ID is missing.',
-                                                  backgroundColor:
-                                                      Colors.orange,
-                                                );
-                                              }
-                                            },
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                  .toList(),
-                        ),
-                      ),
-                    );
-                  }
-                },
+                            ],
+                          ),
+                        )
+                        .toList(),
               ),
             ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-          onAdminDestinationSelected(context, index, widget.admin);
-        },
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-          NavigationDestination(icon: Icon(Icons.dashboard), label: 'Users'),
-          NavigationDestination(icon: Icon(Icons.event), label: 'Bookings'),
-          NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
-        ],
-      ),
+          );
+        }
+      },
     );
   }
+}
+
+Widget usertable(BuildContext context) {
+  return _userTable();
 }

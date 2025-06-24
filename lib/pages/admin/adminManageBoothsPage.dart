@@ -12,24 +12,31 @@ class AdminManageBoothsPage extends StatefulWidget {
 class _AdminManageBoothsPageState extends State<AdminManageBoothsPage> {
   // Stream to listen for real-time updates from the 'boothPackages' collection.
   Stream<List<BoothPackage>> _boothPackagesStream() {
-    return FirebaseFirestore.instance.collection('boothPackages').snapshots().map(
-          (snapshot) => snapshot.docs
-              .map((doc) => BoothPackage.fromFirestore(doc))
-              .toList(),
+    return FirebaseFirestore.instance
+        .collection('boothPackages')
+        .snapshots()
+        .map(
+          (snapshot) =>
+              snapshot.docs
+                  .map((doc) => BoothPackage.fromFirestore(doc))
+                  .toList(),
         );
   }
 
   // Function to delete a booth
   Future<void> _deleteBooth(String boothId) async {
     try {
-      await FirebaseFirestore.instance.collection('boothPackages').doc(boothId).delete();
+      await FirebaseFirestore.instance
+          .collection('boothPackages')
+          .doc(boothId)
+          .delete();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Booth deleted successfully!')),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to delete booth: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to delete booth: $e')));
       print('Error deleting booth: $e');
     }
   }
@@ -47,9 +54,7 @@ class _AdminManageBoothsPageState extends State<AdminManageBoothsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Manage Booths'),
-      ),
+      appBar: AppBar(title: const Text('Manage Booths')),
       body: StreamBuilder<List<BoothPackage>>(
         stream: _boothPackagesStream(),
         builder: (context, snapshot) {
@@ -66,21 +71,28 @@ class _AdminManageBoothsPageState extends State<AdminManageBoothsPage> {
               itemBuilder: (context, index) {
                 final booth = boothPackages[index];
                 return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   child: ListTile(
-                    leading: booth.boothImage.isNotEmpty
-                        ? Image.network(
-                            booth.boothImage,
-                            width: 50,
-                            height: 50,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Icon(Icons.broken_image), // Fallback for broken image
-                          )
-                        : const Icon(Icons.image_not_supported),
+                    leading:
+                        booth.boothImage.isNotEmpty
+                            ? Image.network(
+                              booth.boothImage,
+                              width: 50,
+                              height: 50,
+                              fit: BoxFit.cover,
+                              errorBuilder:
+                                  (context, error, stackTrace) => const Icon(
+                                    Icons.broken_image,
+                                  ), // Fallback for broken image
+                            )
+                            : const Icon(Icons.image_not_supported),
                     title: Text(booth.boothName),
                     subtitle: Text(
-                        'Capacity: ${booth.boothCapacity}\n${booth.boothDescription}'),
+                      'Capacity: ${booth.boothCapacity}\n${booth.boothDescription}',
+                    ),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -95,7 +107,9 @@ class _AdminManageBoothsPageState extends State<AdminManageBoothsPage> {
                               _deleteBooth(booth.id!);
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Booth ID is missing.')),
+                                const SnackBar(
+                                  content: Text('Booth ID is missing.'),
+                                ),
                               );
                             }
                           },
@@ -136,9 +150,15 @@ class _EditBoothDialogState extends State<_EditBoothDialog> {
   void initState() {
     super.initState();
     _boothNameController = TextEditingController(text: widget.booth.boothName);
-    _boothDescriptionController = TextEditingController(text: widget.booth.boothDescription);
-    _boothCapacityController = TextEditingController(text: widget.booth.boothCapacity);
-    _boothImageController = TextEditingController(text: widget.booth.boothImage);
+    _boothDescriptionController = TextEditingController(
+      text: widget.booth.boothDescription,
+    );
+    _boothCapacityController = TextEditingController(
+      text: widget.booth.boothCapacity,
+    );
+    _boothImageController = TextEditingController(
+      text: widget.booth.boothImage,
+    );
   }
 
   @override
@@ -174,9 +194,9 @@ class _EditBoothDialogState extends State<_EditBoothDialog> {
         );
         Navigator.pop(context); // Close the dialog
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to update booth: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to update booth: $e')));
         print('Error updating booth: $e');
       } finally {
         setState(() {
@@ -251,9 +271,9 @@ class _EditBoothDialogState extends State<_EditBoothDialog> {
         _isLoading
             ? const CircularProgressIndicator()
             : ElevatedButton(
-                onPressed: _updateBooth,
-                child: const Text('Update'),
-              ),
+              onPressed: _updateBooth,
+              child: const Text('Update'),
+            ),
       ],
     );
   }

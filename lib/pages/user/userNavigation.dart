@@ -27,9 +27,4 @@ void onUserDestinationSelected(BuildContext context, int index, User user) {
       reverseTransitionDuration: Duration.zero,
     ),
   );
-  const List<NavigationDestination> userNavigationDestinations = [
-    NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-    NavigationDestination(icon: Icon(Icons.book_online), label: 'Bookings'),
-    NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
-  ];
 }

@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:Project_Kururin_Exhibition/pages/admin/adminNavigation.dart';
-import 'package:Project_Kururin_Exhibition/models/booth_book.dart'; // Booking model
-import 'package:Project_Kururin_Exhibition/models/admin.dart'; // Admin model
-import 'package:Project_Kururin_Exhibition/pages/user/userBookingForm.dart'; // Assumed BookingFormPage for editing
-import 'package:Project_Kururin_Exhibition/models/users.dart'; // User model
-import 'package:Project_Kururin_Exhibition/models/booth.dart'; // BoothPackage model
-import 'package:Project_Kururin_Exhibition/models/additionalItems.dart'; // AdditionalItem model
-
-// Import the new booth management pages
+import 'package:Project_Kururin_Exhibition/models/booth_book.dart';
+import 'package:Project_Kururin_Exhibition/models/admin.dart';
+import 'package:Project_Kururin_Exhibition/pages/user/userBookingForm.dart';
+import 'package:Project_Kururin_Exhibition/models/users.dart';
+import 'package:Project_Kururin_Exhibition/models/booth.dart';
+import 'package:Project_Kururin_Exhibition/models/additionalItems.dart';
 import 'package:Project_Kururin_Exhibition/pages/admin/adminAddBooth.dart';
-import 'package:Project_Kururin_Exhibition/pages/admin/adminManageBoothsPage.dart'; // You will create this
+import 'package:Project_Kururin_Exhibition/pages/admin/adminManageBoothsPage.dart';
 
 class AdminBookingPage extends StatefulWidget {
   final Admin admin;
@@ -24,14 +22,70 @@ class AdminBookingPage extends StatefulWidget {
 class _AdminBookingPageState extends State<AdminBookingPage> {
   int _selectedIndex = 2;
 
-  // Helper function to show a SnackBar message
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('EventSphere Admin Dashboard'),
+        automaticallyImplyLeading: false,
+      ),
+      backgroundColor: const Color(0xFFFEFEFA),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              'Booth Booking Management',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              textAlign: TextAlign.left,
+            ),
+            Expanded(child: boothBookingTable(context)),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => showBoothManagementOptions(context),
+        tooltip: 'Manage Booths',
+        child: const Icon(Icons.meeting_room),
+      ),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _selectedIndex,
+        onDestinationSelected: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+          onAdminDestinationSelected(context, index, widget.admin);
+        },
+        destinations: const [
+          NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
+          NavigationDestination(icon: Icon(Icons.dashboard), label: 'Users'),
+          NavigationDestination(icon: Icon(Icons.event), label: 'Bookings'),
+          NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
+        ],
+      ),
+    );
+  }
+}
+
+class _boothBookingTable extends StatefulWidget {
+  const _boothBookingTable({super.key});
+
+  @override
+  State<_boothBookingTable> createState() => _boothBookingTableState();
+}
+
+class _boothBookingTableState extends State<_boothBookingTable> {
   void _showSnackBar(String message, {Color? backgroundColor}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: backgroundColor),
     );
   }
 
-  // Stream to listen for real-time updates from the 'bookings' collection.
   Stream<List<Booking>> _bookingsStream() {
     return FirebaseFirestore.instance
         .collection('bookings')
@@ -42,7 +96,6 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
         );
   }
 
-  // Function to delete a booking directly via Firestore
   Future<void> _deleteBooking(String bookingId) async {
     try {
       await FirebaseFirestore.instance
@@ -55,11 +108,10 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
         'Failed to delete booking: $e',
         backgroundColor: Colors.red,
       );
-      print('Error deleting booking: $e'); // Log the error for debugging
+      print('Error deleting booking: $e');
     }
   }
 
-  // Fetches a single BoothPackage by its ID directly from Firestore.
   Future<String> _getBoothPackageName(String packageId) async {
     try {
       final docSnapshot =
@@ -69,8 +121,7 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
               .get();
       if (docSnapshot.exists) {
         final boothPackage = BoothPackage.fromFirestore(docSnapshot);
-        return boothPackage
-            .boothName; // Corrected to boothName from packageName, based on booth.dart
+        return boothPackage.boothName;
       }
       return 'Unknown Booth';
     } catch (e) {
@@ -79,7 +130,6 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
     }
   }
 
-  // Fetches a single AdditionalItem by its ID directly from Firestore.
   Future<String> _getAdditionalItemName(String itemId) async {
     try {
       final docSnapshot =
@@ -98,33 +148,26 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
     }
   }
 
-  // Helper function to format the list of additional items for display.
   Future<String> _formatAdditionalItems(List<dynamic> items) async {
     if (items.isEmpty) {
       return 'None';
     }
     List<String> itemStrings = [];
     for (var itemData in items) {
-      // Assuming itemData can either be a String (if stored simply) or a Map (if it includes quantity)
       if (itemData is Map<String, dynamic> &&
           itemData.containsKey('itemID') &&
           itemData.containsKey('quantity')) {
         String itemId = itemData['itemID'] as String;
         int quantity = itemData['quantity'] as int;
-        String itemName = await _getAdditionalItemName(
-          itemId,
-        ); // Use direct fetch
+        String itemName = await _getAdditionalItemName(itemId);
         itemStrings.add('$itemName (x$quantity)');
       } else if (itemData is String) {
-        // If additional items are stored as simple strings, you might need to fetch their full names
-        // or assume the string itself is the name. For simplicity, we'll use the string directly.
         itemStrings.add(itemData);
       }
     }
     return itemStrings.join(', ');
   }
 
-  // Fetches a user by their email directly from Firestore.
   Future<User?> _getUserByEmail(String email) async {
     try {
       final querySnapshot =
@@ -136,108 +179,15 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
       if (querySnapshot.docs.isNotEmpty) {
         return User.fromFirestore(querySnapshot.docs.first);
       }
-      return null; // User not found
+      return null;
     } catch (e) {
       print('Error getting user by email: $e');
       return null;
     }
   }
 
-  // Function to show the booth management options
-  void _showBoothManagementOptions() {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            ListTile(
-              leading: const Icon(Icons.add),
-              title: const Text('Add New Booth'),
-              onTap: () {
-                Navigator.pop(context); // Close the bottom sheet
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const AdminAddBoothPage(),
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.edit),
-              title: const Text('Manage Existing Booths'),
-              onTap: () {
-                Navigator.pop(context); // Close the bottom sheet
-                // Navigate to a page where you can list, edit, and delete booths
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const AdminManageBoothsPage(),
-                  ),
-                );
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('EventSphere Admin Dashboard'),
-        automaticallyImplyLeading: false,
-      ),
-      backgroundColor: const Color(0xFFFEFEFA),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start, // Ensure children align left
-          children: <Widget>[
-            Text(
-              'Booth Booking Management ',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              textAlign: TextAlign.left,
-            ),
-            Expanded(child: boothBookingCardList(context)),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showBoothManagementOptions,
-        child: const Icon(Icons.meeting_room), // Icon for booth management
-        tooltip: 'Manage Booths',
-      ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-          // Assuming onAdminDestinationSelected is a global or accessible function
-          // You might need to import it or define it in a utility file
-          onAdminDestinationSelected(context, index, widget.admin);
-        },
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-          NavigationDestination(icon: Icon(Icons.dashboard), label: 'Users'),
-          NavigationDestination(icon: Icon(Icons.event), label: 'Bookings'),
-          NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
-        ],
-      ),
-    );
-  }
-
-  // Widget to display a list of booth bookings using Cards.
-  Widget boothBookingCardList(BuildContext context) {
     return StreamBuilder<List<Booking>>(
       stream: _bookingsStream(),
       builder: (context, snapshot) {
@@ -257,9 +207,7 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
                 margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 child: ListTile(
                   title: FutureBuilder<String>(
-                    future: _getBoothPackageName(
-                      booking.boothPackageID,
-                    ), // Use boothPackageID
+                    future: _getBoothPackageName(booking.boothPackageID),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Text("Booth: Loading...");
@@ -276,15 +224,13 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text("User ID: ${booking.userID ?? 'N/A'}"),
-                      Text(
-                        "User Email: ${booking.userEmail ?? 'N/A'}",
-                      ), // Display user email
+                      Text("User Email: ${booking.userEmail ?? 'N/A'}"),
                       Text("Booking Date: ${booking.bookingDate}"),
                       Text("Event Date: ${booking.eventDate}"),
                       Text("Event Time: ${booking.eventTime}"),
                       Text("Status: ${booking.status}"),
                       Text(
-                        "Total Price: \RM${booking.totalPrice.toStringAsFixed(2)}",
+                        "Total Price: RM${booking.totalPrice.toStringAsFixed(2)}",
                       ),
                       FutureBuilder<String>(
                         future: _formatAdditionalItems(
@@ -310,11 +256,8 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
                         icon: const Icon(Icons.edit),
                         onPressed: () async {
                           User? user;
-                          // Prioritize fetching user by userID if available and reliable
-                          // Otherwise, fallback to email or handle as per your User model's unique identifier.
                           if (booking.userID.isNotEmpty) {
                             try {
-                              // Assuming 'userID' in Booking corresponds to the document ID in 'users' collection
                               DocumentSnapshot userDoc =
                                   await FirebaseFirestore.instance
                                       .collection('users')
@@ -324,7 +267,6 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
                                 user = User.fromFirestore(userDoc);
                               } else if (booking.userEmail != null &&
                                   booking.userEmail!.isNotEmpty) {
-                                // Fallback to email if user ID lookup fails
                                 user = await _getUserByEmail(
                                   booking.userEmail!,
                                 );
@@ -333,7 +275,6 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
                               print(
                                 'Error fetching user by ID for booking edit: $e',
                               );
-                              // Fallback to email if error occurs with ID
                               if (booking.userEmail != null &&
                                   booking.userEmail!.isNotEmpty) {
                                 user = await _getUserByEmail(
@@ -343,7 +284,6 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
                             }
                           } else if (booking.userEmail != null &&
                               booking.userEmail!.isNotEmpty) {
-                            // If userID is not present, try fetching by email
                             user = await _getUserByEmail(booking.userEmail!);
                           }
 
@@ -353,8 +293,7 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
                               MaterialPageRoute(
                                 builder:
                                     (_) => BookingFormPage(
-                                      user:
-                                          user!, // <-- FIX: Use ! to assert non-null
+                                      user: user!,
                                       existingBooking: booking,
                                     ),
                               ),
@@ -390,4 +329,47 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
       },
     );
   }
+}
+
+Widget boothBookingTable(BuildContext context) {
+  return const _boothBookingTable();
+}
+
+void showBoothManagementOptions(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    builder: (BuildContext context) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          ListTile(
+            leading: const Icon(Icons.add),
+            title: const Text('Add New Booth'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const AdminAddBoothPage(),
+                ),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.edit),
+            title: const Text('Manage Existing Booths'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const AdminManageBoothsPage(),
+                ),
+              );
+            },
+          ),
+        ],
+      );
+    },
+  );
 }
