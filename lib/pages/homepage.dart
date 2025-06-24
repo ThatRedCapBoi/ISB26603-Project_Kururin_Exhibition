@@ -25,10 +25,7 @@ class HomePage extends StatelessWidget {
                 MaterialPageRoute(builder: (context) => const LoginPage()),
               );
             },
-            child: const Text(
-              'Login',
-              style: TextStyle(color: Colors.white),
-            ),
+            child: const Text('Login', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -38,7 +35,8 @@ class HomePage extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 24, 16, 8), // Added const
             child: Column(
               children: [
-                const Text( // Added const
+                const Text(
+                  // Added const
                   '🎉 Welcome to Kururin Exhibition 🎉',
                   style: TextStyle(
                     fontSize: 26,
@@ -48,7 +46,8 @@ class HomePage extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 10), // Added const
-                const Text( // Added const
+                const Text(
+                  // Added const
                   'Your one-stop platform for seamless exhibition booth reservations. '
                   'Discover flexible packages, book online, and manage your events with ease.',
                   style: TextStyle(
@@ -65,7 +64,10 @@ class HomePage extends StatelessWidget {
           // Fetch booth packages from Firestore using StreamBuilder
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance.collection('boothPackages').snapshots(),
+              stream:
+                  FirebaseFirestore.instance
+                      .collection('boothPackages')
+                      .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
@@ -74,18 +76,26 @@ class HomePage extends StatelessWidget {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 }
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return const Center(child: Text('No booth packages available.'));
+                  return const Center(
+                    child: Text('No booth packages available.'),
+                  );
                 }
 
-                final boothPackages = snapshot.data!.docs.map((doc) {
-                  return BoothPackage.fromFirestore(doc); // Use the updated fromFirestore factory
-                }).toList();
+                final boothPackages =
+                    snapshot.data!.docs.map((doc) {
+                      return BoothPackage.fromFirestore(
+                        doc,
+                      ); // Use the updated fromFirestore factory
+                    }).toList();
 
                 return ListView.builder(
                   itemCount: boothPackages.length,
                   itemBuilder: (context, index) {
                     final booth = boothPackages[index];
-                    return BoothCard(context, booth); // Reusing the BoothCard widget
+                    return BoothCard(
+                      context,
+                      booth,
+                    ); // Reusing the BoothCard widget
                   },
                 );
               },
@@ -104,9 +114,7 @@ Widget BoothCard(BuildContext context, BoothPackage booth) {
   return Card(
     margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
     elevation: 5,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(15),
-    ),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
     child: Column(
       children: [
         ClipRRect(
@@ -129,16 +137,17 @@ Widget BoothCard(BuildContext context, BoothPackage booth) {
           onTap: () {
             showDialog(
               context: context,
-              builder: (_) => AlertDialog(
-                title: Text(booth.boothName),
-                content: Text(booth.boothDescription),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text("Close"),
+              builder:
+                  (_) => AlertDialog(
+                    title: Text(booth.boothName),
+                    content: Text(booth.boothDescription),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text("Close"),
+                      ),
+                    ],
                   ),
-                ],
-              ),
             );
           },
         ),

@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:Project_Kururin_Exhibition/models/admin.dart';
-import 'package:Project_Kururin_Exhibition/models/users.dart' as my_models; // Alias to avoid conflict with FirebaseAuth.User
+import 'package:Project_Kururin_Exhibition/models/users.dart'
+    as my_models; // Alias to avoid conflict with FirebaseAuth.User
 import 'package:Project_Kururin_Exhibition/pages/admin/adminNavigation.dart'; // Assuming this provides onAdminDestinationSelected
 
 class AdminDashboard extends StatefulWidget {
@@ -19,19 +20,20 @@ class _AdminDashboardState extends State<AdminDashboard> {
   // Helper function to show a SnackBar message
   void _showSnackBar(String message, {Color? backgroundColor}) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: backgroundColor,
-      ),
+      SnackBar(content: Text(message), backgroundColor: backgroundColor),
     );
   }
 
   // Stream to listen for real-time updates from the 'users' collection.
   Stream<List<my_models.User>> _usersStream() {
-    return FirebaseFirestore.instance.collection('users').snapshots().map(
-          (snapshot) => snapshot.docs
-              .map((doc) => my_models.User.fromFirestore(doc))
-              .toList(),
+    return FirebaseFirestore.instance
+        .collection('users')
+        .snapshots()
+        .map(
+          (snapshot) =>
+              snapshot.docs
+                  .map((doc) => my_models.User.fromFirestore(doc))
+                  .toList(),
         );
   }
 
@@ -50,7 +52,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('EventSphere'),
+        title: const Text('EventSphere Admin Dashboard'),
         automaticallyImplyLeading: false,
       ),
       backgroundColor: const Color(0xFFFEFEFA),
@@ -58,6 +60,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            SizedBox(height: 16),
             Text(
               'User Management Page',
               style: TextStyle(
@@ -70,7 +73,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
             // Use StreamBuilder for real-time updates of user list
             Expanded(
               child: StreamBuilder<List<my_models.User>>(
-                stream: _usersStream(), // Use a stream to listen for real-time changes
+                stream:
+                    _usersStream(), // Use a stream to listen for real-time changes
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
@@ -83,65 +87,99 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     return SingleChildScrollView(
                       scrollDirection: Axis.vertical,
                       child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal, // Allow horizontal scrolling for wide tables
+                        scrollDirection:
+                            Axis.horizontal, // Allow horizontal scrolling for wide tables
                         child: DataTable(
                           columnSpacing: 8.0, // Reduce spacing between columns
                           columns: const [
                             DataColumn(
                               label: Expanded(
-                                child: Text('ID', overflow: TextOverflow.ellipsis),
+                                child: Text(
+                                  'ID',
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                             ),
                             DataColumn(
                               label: Expanded(
-                                child: Text('Name', overflow: TextOverflow.ellipsis),
+                                child: Text(
+                                  'Name',
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                             ),
                             DataColumn(
                               label: Expanded(
-                                child: Text('Email', overflow: TextOverflow.ellipsis),
+                                child: Text(
+                                  'Email',
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                             ),
                             DataColumn(
                               label: Expanded(
-                                child: Text('Phone', overflow: TextOverflow.ellipsis),
+                                child: Text(
+                                  'Phone',
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                             ),
                             DataColumn(
                               label: SizedBox(width: 24), // For trailing icon
                             ),
                           ],
-                          rows: users
-                              .map(
-                                (user) => DataRow(
-                                  cells: [
-                                    DataCell(Text(user.id?.toString() ?? 'N/A')), // Display Firestore document ID
-                                    DataCell(
-                                      Text(user.name, overflow: TextOverflow.ellipsis),
+                          rows:
+                              users
+                                  .map(
+                                    (user) => DataRow(
+                                      cells: [
+                                        DataCell(
+                                          Text(user.id?.toString() ?? 'N/A'),
+                                        ), // Display Firestore document ID
+                                        DataCell(
+                                          Text(
+                                            user.name,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        DataCell(
+                                          Text(
+                                            user.email,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        DataCell(
+                                          Text(
+                                            user.phone,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        DataCell(
+                                          IconButton(
+                                            icon: const Icon(
+                                              Icons.delete,
+                                              color: Colors.red,
+                                            ),
+                                            tooltip: 'Delete',
+                                            onPressed: () {
+                                              if (user.id != null) {
+                                                _deleteUser(
+                                                  user.id!,
+                                                ); // Call the direct delete function
+                                              } else {
+                                                _showSnackBar(
+                                                  'User ID is missing.',
+                                                  backgroundColor:
+                                                      Colors.orange,
+                                                );
+                                              }
+                                            },
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    DataCell(
-                                      Text(user.email, overflow: TextOverflow.ellipsis),
-                                    ),
-                                    DataCell(
-                                      Text(user.phone, overflow: TextOverflow.ellipsis),
-                                    ),
-                                    DataCell(
-                                      IconButton(
-                                        icon: const Icon(Icons.delete, color: Colors.red),
-                                        tooltip: 'Delete',
-                                        onPressed: () {
-                                          if (user.id != null) {
-                                            _deleteUser(user.id!); // Call the direct delete function
-                                          } else {
-                                            _showSnackBar('User ID is missing.', backgroundColor: Colors.orange);
-                                          }
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                              .toList(),
+                                  )
+                                  .toList(),
                         ),
                       ),
                     );
@@ -162,14 +200,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
         },
         destinations: const [
           NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-          NavigationDestination(
-            icon: Icon(Icons.dashboard),
-            label: 'Dashboard',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.book_online),
-            label: 'Booking',
-          ),
+          NavigationDestination(icon: Icon(Icons.dashboard), label: 'Users'),
+          NavigationDestination(icon: Icon(Icons.event), label: 'Bookings'),
           NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),

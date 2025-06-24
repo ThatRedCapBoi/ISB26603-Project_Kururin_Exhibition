@@ -43,6 +43,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            SizedBox(height: 16),
             Text(
               'Welcome, ${widget.admin.name}!',
               style: TextStyle(
@@ -64,11 +65,15 @@ class _AdminHomePageState extends State<AdminHomePage> {
             _selectedIndex = index;
           });
           // Call the function from adminNavigation.dart
-          onAdminDestinationSelected(context, index, widget.admin); // Changed function name
+          onAdminDestinationSelected(
+            context,
+            index,
+            widget.admin,
+          ); // Changed function name
         },
         destinations: const [
           NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-          NavigationDestination(icon: Icon(Icons.dashboard), label: 'Dashboard'),
+          NavigationDestination(icon: Icon(Icons.dashboard), label: 'Users'),
           NavigationDestination(icon: Icon(Icons.event), label: 'Bookings'),
           NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
         ],
@@ -89,7 +94,10 @@ class _AdminTableState extends State<_AdminTable> {
   // Method to delete an admin from Firestore
   Future<void> _deleteAdmin(String adminId) async {
     try {
-      await FirebaseFirestore.instance.collection('administrators').doc(adminId).delete();
+      await FirebaseFirestore.instance
+          .collection('administrators')
+          .doc(adminId)
+          .delete();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Admin deleted successfully!')),
       );
@@ -104,7 +112,8 @@ class _AdminTableState extends State<_AdminTable> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('administrators').snapshots(),
+      stream:
+          FirebaseFirestore.instance.collection('administrators').snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -116,43 +125,68 @@ class _AdminTableState extends State<_AdminTable> {
           return const Center(child: Text('No administrators found.'));
         }
 
-        final admins = snapshot.data!.docs.map((doc) {
-          return Admin.fromFirestore(doc); // Use the updated fromFirestore factory
-        }).toList();
+        final admins =
+            snapshot.data!.docs.map((doc) {
+              return Admin.fromFirestore(
+                doc,
+              ); // Use the updated fromFirestore factory
+            }).toList();
 
         return SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: DataTable(
+            columnSpacing: 8.0,
             columns: const [
-              DataColumn(label: Text('ID (UID)')), // Changed to UID for Firebase
+              DataColumn(
+                label: Text('ID (UID)'),
+              ), // Changed to UID for Firebase
               DataColumn(label: Text('Name')),
               DataColumn(label: Text('Email')),
               DataColumn(label: Text('Actions')), // For delete button
             ],
-            rows: admins.map(
-              (admin) => DataRow(
-                cells: [
-                  DataCell(Text(admin.id)), // Display UID
-                  DataCell(Text(admin.name)),
-                  DataCell(Text(admin.email)),
-                  DataCell(
-                    IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.red),
-                      tooltip: 'Delete',
-                      onPressed: () {
-                        if (admin.id.isNotEmpty) {
-                          _deleteAdmin(admin.id);
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Admin ID is missing.')),
-                          );
-                        }
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ).toList(),
+            rows:
+                admins
+                    .map(
+                      (admin) => DataRow(
+                        cells: [
+                          DataCell(
+                            SizedBox(
+                              width: 120,
+                              child: Text(
+                                admin.id,
+                                softWrap: true,
+                                overflow: TextOverflow.visible,
+                              ),
+                            ),
+                          ), // Display UID
+                          DataCell(
+                            SizedBox(
+                              width: 100,
+                              child: Text(admin.name, softWrap: true),
+                            ),
+                          ),
+                          DataCell(Text(admin.email)),
+                          DataCell(
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              tooltip: 'Delete',
+                              onPressed: () {
+                                if (admin.id.isNotEmpty) {
+                                  _deleteAdmin(admin.id);
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Admin ID is missing.'),
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                    .toList(),
           ),
         );
       },

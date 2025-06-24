@@ -4,14 +4,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Booking {
   final String? id; // Document ID from Firestore
   final String? userEmail;
-  final String boothPackageID; // Renamed from boothType to match Firebase field 'boothPackageID'
-  final List<dynamic> selectedAddItems; // Matches 'selectedAddItems' from Firebase
-  final String bookingDate; // Renamed from 'date' to match 'bookingDate' from Firebase
+  final String
+  boothPackageID; // Renamed from boothType to match Firebase field 'boothPackageID'
+  final List<dynamic>
+  selectedAddItems; // Matches 'selectedAddItems' from Firebase
+  final String
+  bookingDate; // Renamed from 'date' to match 'bookingDate' from Firebase
   final String eventDate; // New field from Firebase snapshot
   final String eventTime; // New field from Firebase snapshot
   final String status; // New field from Firebase snapshot
   final double totalPrice; // New field from Firebase snapshot
-  final String userID; // New field from Firebase snapshot, renamed from 'userId' to 'userID'
+  final String
+  userID; // New field from Firebase snapshot, renamed from 'userId' to 'userID'
 
   Booking({
     this.id,
@@ -30,6 +34,17 @@ class Booking {
   factory Booking.fromFirestore(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
+    // Helper to convert Timestamp to String
+    String timestampToString(dynamic value) {
+      if (value is Timestamp) {
+        return value.toDate().toString(); // or use DateFormat for custom format
+      } else if (value is String) {
+        return value;
+      } else {
+        return '';
+      }
+    }
+
     // Ensure 'selectedAddItems' is a List, default to empty list if null
     List<dynamic> items = [];
     if (data['selectedAddItems'] is List) {
@@ -38,15 +53,22 @@ class Booking {
 
     return Booking(
       id: doc.id, // Assign the document ID
-      userEmail: data['userEmail'], // This field isn't in your image, but keeping it if it's elsewhere
+      userEmail:
+          data['userEmail'], // This field isn't in your image, but keeping it if it's elsewhere
       boothPackageID: data['boothPackageID'] ?? '', // Match Firebase field name
       selectedAddItems: items,
-      bookingDate: data['bookingDate'] ?? '', // Match Firebase field name
-      eventDate: data['eventDate'] ?? '', // Match Firebase field name
+      bookingDate: timestampToString(
+        data['bookingDate'],
+      ), // Match Firebase field name
+      eventDate: timestampToString(
+        data['eventDate'],
+      ), // Match Firebase field name
       eventTime: data['eventTime'] ?? '', // Match Firebase field name
       status: data['status'] ?? '', // Match Firebase field name
-      totalPrice: (data['totalPrice'] ?? 0).toDouble(), // Match Firebase field name
-      userID: data['userID'] ?? '', // Match Firebase field name (case-sensitive)
+      totalPrice:
+          (data['totalPrice'] ?? 0).toDouble(), // Match Firebase field name
+      userID:
+          data['userID'] ?? '', // Match Firebase field name (case-sensitive)
     );
   }
 
@@ -61,7 +83,9 @@ class Booking {
       'status': status,
       'totalPrice': totalPrice,
       'userID': userID, // Ensure case matches Firestore
-      if (userEmail != null) 'userEmail': userEmail, // Only include if userEmail is relevant for new bookings
+      if (userEmail != null)
+        'userEmail':
+            userEmail, // Only include if userEmail is relevant for new bookings
     };
   }
 }

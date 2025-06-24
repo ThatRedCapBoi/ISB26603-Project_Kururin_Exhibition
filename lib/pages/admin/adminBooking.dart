@@ -27,29 +27,34 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
   // Helper function to show a SnackBar message
   void _showSnackBar(String message, {Color? backgroundColor}) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: backgroundColor,
-      ),
+      SnackBar(content: Text(message), backgroundColor: backgroundColor),
     );
   }
 
   // Stream to listen for real-time updates from the 'bookings' collection.
   Stream<List<Booking>> _bookingsStream() {
-    return FirebaseFirestore.instance.collection('bookings').snapshots().map(
-          (snapshot) => snapshot.docs
-              .map((doc) => Booking.fromFirestore(doc))
-              .toList(),
+    return FirebaseFirestore.instance
+        .collection('bookings')
+        .snapshots()
+        .map(
+          (snapshot) =>
+              snapshot.docs.map((doc) => Booking.fromFirestore(doc)).toList(),
         );
   }
 
   // Function to delete a booking directly via Firestore
   Future<void> _deleteBooking(String bookingId) async {
     try {
-      await FirebaseFirestore.instance.collection('bookings').doc(bookingId).delete();
+      await FirebaseFirestore.instance
+          .collection('bookings')
+          .doc(bookingId)
+          .delete();
       _showSnackBar('Booking deleted successfully.');
     } catch (e) {
-      _showSnackBar('Failed to delete booking: $e', backgroundColor: Colors.red);
+      _showSnackBar(
+        'Failed to delete booking: $e',
+        backgroundColor: Colors.red,
+      );
       print('Error deleting booking: $e'); // Log the error for debugging
     }
   }
@@ -57,10 +62,15 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
   // Fetches a single BoothPackage by its ID directly from Firestore.
   Future<String> _getBoothPackageName(String packageId) async {
     try {
-      final docSnapshot = await FirebaseFirestore.instance.collection('boothPackages').doc(packageId).get();
+      final docSnapshot =
+          await FirebaseFirestore.instance
+              .collection('boothPackages')
+              .doc(packageId)
+              .get();
       if (docSnapshot.exists) {
         final boothPackage = BoothPackage.fromFirestore(docSnapshot);
-        return boothPackage.boothName; // Corrected to boothName from packageName, based on booth.dart
+        return boothPackage
+            .boothName; // Corrected to boothName from packageName, based on booth.dart
       }
       return 'Unknown Booth';
     } catch (e) {
@@ -72,7 +82,11 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
   // Fetches a single AdditionalItem by its ID directly from Firestore.
   Future<String> _getAdditionalItemName(String itemId) async {
     try {
-      final docSnapshot = await FirebaseFirestore.instance.collection('additionalItems').doc(itemId).get();
+      final docSnapshot =
+          await FirebaseFirestore.instance
+              .collection('additionalItems')
+              .doc(itemId)
+              .get();
       if (docSnapshot.exists) {
         final item = AdditionalItem.fromFirestore(docSnapshot);
         return item.itemName;
@@ -92,15 +106,19 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
     List<String> itemStrings = [];
     for (var itemData in items) {
       // Assuming itemData can either be a String (if stored simply) or a Map (if it includes quantity)
-      if (itemData is Map<String, dynamic> && itemData.containsKey('itemID') && itemData.containsKey('quantity')) {
+      if (itemData is Map<String, dynamic> &&
+          itemData.containsKey('itemID') &&
+          itemData.containsKey('quantity')) {
         String itemId = itemData['itemID'] as String;
         int quantity = itemData['quantity'] as int;
-        String itemName = await _getAdditionalItemName(itemId); // Use direct fetch
+        String itemName = await _getAdditionalItemName(
+          itemId,
+        ); // Use direct fetch
         itemStrings.add('$itemName (x$quantity)');
       } else if (itemData is String) {
-         // If additional items are stored as simple strings, you might need to fetch their full names
-         // or assume the string itself is the name. For simplicity, we'll use the string directly.
-         itemStrings.add(itemData);
+        // If additional items are stored as simple strings, you might need to fetch their full names
+        // or assume the string itself is the name. For simplicity, we'll use the string directly.
+        itemStrings.add(itemData);
       }
     }
     return itemStrings.join(', ');
@@ -109,11 +127,12 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
   // Fetches a user by their email directly from Firestore.
   Future<User?> _getUserByEmail(String email) async {
     try {
-      final querySnapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .where('email', isEqualTo: email)
-          .limit(1)
-          .get();
+      final querySnapshot =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .where('email', isEqualTo: email)
+              .limit(1)
+              .get();
       if (querySnapshot.docs.isNotEmpty) {
         return User.fromFirestore(querySnapshot.docs.first);
       }
@@ -139,7 +158,9 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
                 Navigator.pop(context); // Close the bottom sheet
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const AdminAddBoothPage()),
+                  MaterialPageRoute(
+                    builder: (context) => const AdminAddBoothPage(),
+                  ),
                 );
               },
             ),
@@ -151,7 +172,9 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
                 // Navigate to a page where you can list, edit, and delete booths
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const AdminManageBoothsPage()),
+                  MaterialPageRoute(
+                    builder: (context) => const AdminManageBoothsPage(),
+                  ),
                 );
               },
             ),
@@ -165,7 +188,7 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('EventSphere'),
+        title: const Text('EventSphere Admin Dashboard'),
         automaticallyImplyLeading: false,
       ),
       backgroundColor: const Color(0xFFFEFEFA),
@@ -203,14 +226,8 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
         },
         destinations: const [
           NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-          NavigationDestination(
-            icon: Icon(Icons.dashboard),
-            label: 'Dashboard',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.book_online),
-            label: 'Booking',
-          ),
+          NavigationDestination(icon: Icon(Icons.dashboard), label: 'Users'),
+          NavigationDestination(icon: Icon(Icons.event), label: 'Bookings'),
           NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
@@ -238,14 +255,18 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
                 margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 child: ListTile(
                   title: FutureBuilder<String>(
-                    future: _getBoothPackageName(booking.boothPackageID), // Use boothPackageID
+                    future: _getBoothPackageName(
+                      booking.boothPackageID,
+                    ), // Use boothPackageID
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Text("Booth: Loading...");
                       } else if (snapshot.hasError) {
                         return const Text("Booth: Error");
                       } else {
-                        return Text("Booth: ${snapshot.data ?? 'Unknown Booth'}");
+                        return Text(
+                          "Booth: ${snapshot.data ?? 'Unknown Booth'}",
+                        );
                       }
                     },
                   ),
@@ -253,16 +274,23 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text("User ID: ${booking.userID ?? 'N/A'}"),
-                      Text("User Email: ${booking.userEmail ?? 'N/A'}"), // Display user email
+                      Text(
+                        "User Email: ${booking.userEmail ?? 'N/A'}",
+                      ), // Display user email
                       Text("Booking Date: ${booking.bookingDate}"),
                       Text("Event Date: ${booking.eventDate}"),
                       Text("Event Time: ${booking.eventTime}"),
                       Text("Status: ${booking.status}"),
-                      Text("Total Price: \$${booking.totalPrice.toStringAsFixed(2)}"),
+                      Text(
+                        "Total Price: \RM${booking.totalPrice.toStringAsFixed(2)}",
+                      ),
                       FutureBuilder<String>(
-                        future: _formatAdditionalItems(booking.selectedAddItems),
+                        future: _formatAdditionalItems(
+                          booking.selectedAddItems,
+                        ),
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
                             return const Text("Items: Loading...");
                           } else if (snapshot.hasError) {
                             return const Text("Items: Error");
@@ -285,21 +313,34 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
                           if (booking.userID.isNotEmpty) {
                             try {
                               // Assuming 'userID' in Booking corresponds to the document ID in 'users' collection
-                              DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(booking.userID).get();
+                              DocumentSnapshot userDoc =
+                                  await FirebaseFirestore.instance
+                                      .collection('users')
+                                      .doc(booking.userID)
+                                      .get();
                               if (userDoc.exists) {
                                 user = User.fromFirestore(userDoc);
-                              } else if (booking.userEmail != null && booking.userEmail!.isNotEmpty) {
+                              } else if (booking.userEmail != null &&
+                                  booking.userEmail!.isNotEmpty) {
                                 // Fallback to email if user ID lookup fails
-                                user = await _getUserByEmail(booking.userEmail!);
+                                user = await _getUserByEmail(
+                                  booking.userEmail!,
+                                );
                               }
                             } catch (e) {
-                              print('Error fetching user by ID for booking edit: $e');
+                              print(
+                                'Error fetching user by ID for booking edit: $e',
+                              );
                               // Fallback to email if error occurs with ID
-                              if (booking.userEmail != null && booking.userEmail!.isNotEmpty) {
-                                user = await _getUserByEmail(booking.userEmail!);
+                              if (booking.userEmail != null &&
+                                  booking.userEmail!.isNotEmpty) {
+                                user = await _getUserByEmail(
+                                  booking.userEmail!,
+                                );
                               }
                             }
-                          } else if (booking.userEmail != null && booking.userEmail!.isNotEmpty) {
+                          } else if (booking.userEmail != null &&
+                              booking.userEmail!.isNotEmpty) {
                             // If userID is not present, try fetching by email
                             user = await _getUserByEmail(booking.userEmail!);
                           }
@@ -308,10 +349,12 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
                             await Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => BookingFormPage(
-                                  user: user!, // <-- FIX: Use ! to assert non-null
-                                  existingBooking: booking,
-                                ),
+                                builder:
+                                    (_) => BookingFormPage(
+                                      user:
+                                          user!, // <-- FIX: Use ! to assert non-null
+                                      existingBooking: booking,
+                                    ),
                               ),
                             );
                           } else {
@@ -328,7 +371,10 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
                           if (booking.id != null) {
                             _deleteBooking(booking.id!);
                           } else {
-                            _showSnackBar('Booking ID is missing.', backgroundColor: Colors.orange);
+                            _showSnackBar(
+                              'Booking ID is missing.',
+                              backgroundColor: Colors.orange,
+                            );
                           }
                         },
                       ),

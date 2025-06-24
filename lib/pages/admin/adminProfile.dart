@@ -19,7 +19,7 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('EventSphere'),
+        title: const Text('EventSphere Admin Dashboard'),
         automaticallyImplyLeading: false,
       ),
       backgroundColor: const Color(0xFFFEFEFA),
@@ -62,14 +62,8 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
         },
         destinations: const [
           NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-          NavigationDestination(
-            icon: Icon(Icons.dashboard),
-            label: 'Dashboard',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.book_online),
-            label: 'Booking',
-          ),
+          NavigationDestination(icon: Icon(Icons.dashboard), label: 'Users'),
+          NavigationDestination(icon: Icon(Icons.event), label: 'Bookings'),
           NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),

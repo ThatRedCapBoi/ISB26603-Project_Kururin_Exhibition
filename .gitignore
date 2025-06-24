@@ -206,3 +206,4 @@ GeneratedPlugin*
 
 # Sentry Upload
 sentry.properties
+lib/firebase_options.dart

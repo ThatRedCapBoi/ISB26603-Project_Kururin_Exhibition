@@ -1,18 +1,22 @@
 // lib/models/booth.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class BoothPackage { // Renamed from boothPackage to BoothPackage for Dart convention
+class BoothPackage {
+  // Renamed from boothPackage to BoothPackage for Dart convention
   final String? id; // Firestore Document ID
   final String boothName;
   final String boothDescription;
   final String boothCapacity;
-  final String boothImage; // Assuming this might be a URL to image in Firebase Storage or a static asset path
+  final int boothPrice; // Assuming a default price, adjust as needed
+  final String
+  boothImage; // Assuming this might be a URL to image in Firebase Storage or a static asset path
 
   BoothPackage({
     this.id,
     required this.boothName,
     required this.boothDescription,
     required this.boothCapacity,
+    required this.boothPrice,
     required this.boothImage,
   });
 
@@ -24,6 +28,7 @@ class BoothPackage { // Renamed from boothPackage to BoothPackage for Dart conve
       boothName: data['boothName'] ?? '',
       boothDescription: data['boothDescription'] ?? '',
       boothCapacity: data['boothCapacity'] ?? '',
+      boothPrice: data['boothPrice'] ?? 0, // Default to 0 if not set
       boothImage: data['boothImage'] ?? '',
     );
   }
@@ -34,6 +39,7 @@ class BoothPackage { // Renamed from boothPackage to BoothPackage for Dart conve
       'boothName': boothName,
       'boothDescription': boothDescription,
       'boothCapacity': boothCapacity,
+      'boothPrice': boothPrice,
       'boothImage': boothImage,
     };
   }

@@ -13,9 +13,13 @@ class AdminAddBoothPage extends StatefulWidget {
 class _AdminAddBoothPageState extends State<AdminAddBoothPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _boothNameController = TextEditingController();
-  final TextEditingController _boothDescriptionController = TextEditingController();
-  final TextEditingController _boothCapacityController = TextEditingController();
-  final TextEditingController _boothImageController = TextEditingController(); // For image URL/path
+  final TextEditingController _boothDescriptionController =
+      TextEditingController();
+  final TextEditingController _boothCapacityController =
+      TextEditingController();
+  final TextEditingController _boothPriceController = TextEditingController();
+  final TextEditingController _boothImageController =
+      TextEditingController(); // For image URL/path
 
   bool _isLoading = false;
 
@@ -30,19 +34,22 @@ class _AdminAddBoothPageState extends State<AdminAddBoothPage> {
           boothName: _boothNameController.text.trim(),
           boothDescription: _boothDescriptionController.text.trim(),
           boothCapacity: _boothCapacityController.text.trim(),
+          boothPrice: int.tryParse(_boothPriceController.text.trim()) ?? 0,
           boothImage: _boothImageController.text.trim(),
         );
 
-        await FirebaseFirestore.instance.collection('boothPackages').add(newBooth.toFirestore());
+        await FirebaseFirestore.instance
+            .collection('boothPackages')
+            .add(newBooth.toFirestore());
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Booth added successfully!')),
         );
         Navigator.pop(context); // Go back to the AdminBookingPage
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to add booth: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to add booth: $e')));
         print('Error adding booth: $e');
       } finally {
         setState(() {
@@ -64,9 +71,7 @@ class _AdminAddBoothPageState extends State<AdminAddBoothPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add New Booth'),
-      ),
+      appBar: AppBar(title: const Text('Add New Booth')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -99,7 +104,9 @@ class _AdminAddBoothPageState extends State<AdminAddBoothPage> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _boothCapacityController,
-                decoration: const InputDecoration(labelText: 'Capacity (e.g., "50 people")'),
+                decoration: const InputDecoration(
+                  labelText: 'Capacity (e.g., "50 people")',
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter booth capacity';
@@ -120,12 +127,13 @@ class _AdminAddBoothPageState extends State<AdminAddBoothPage> {
               ),
               const SizedBox(height: 32),
               Center(
-                child: _isLoading
-                    ? const CircularProgressIndicator()
-                    : ElevatedButton(
-                        onPressed: _addBooth,
-                        child: const Text('Add Booth'),
-                      ),
+                child:
+                    _isLoading
+                        ? const CircularProgressIndicator()
+                        : ElevatedButton(
+                          onPressed: _addBooth,
+                          child: const Text('Add Booth'),
+                        ),
               ),
             ],
           ),
