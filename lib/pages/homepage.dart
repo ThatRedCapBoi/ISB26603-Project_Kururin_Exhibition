@@ -12,7 +12,6 @@ class HomePage extends StatelessWidget {
     // final List<boothPackage> boothPackages = boothPackage.getBoothPackages();
 
     return Scaffold(
-      backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: const Text('EventSphere'), // Added const
         automaticallyImplyLeading: false,

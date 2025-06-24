@@ -23,8 +23,6 @@ class _ProfilePageState extends State<ProfilePage> {
   final usernameCtrl = TextEditingController(); // Added for username
   final pwCtrl = TextEditingController(); // For Firebase Auth password update
 
-  int _selectedIndex = 2;
-
   @override
   void initState() {
     super.initState();
@@ -136,19 +134,31 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    int selectedIndex = 2;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Profile'),
+        title: const Text('EventSphere'),
         automaticallyImplyLeading: false,
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20),
         child: Form(
           key: _form,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text(
+                'Profile Information',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                textAlign: TextAlign.left,
+              ),
               TextFormField(
                 controller: nameCtrl,
                 decoration: const InputDecoration(labelText: 'Name'),
@@ -183,17 +193,30 @@ class _ProfilePageState extends State<ProfilePage> {
                             ? 'Min 6 chars for new password'
                             : null,
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(onPressed: _save, child: const Text('Save')),
+              const SizedBox(height: 24),
+              Center(
+                child: ElevatedButton(
+                  onPressed: _save,
+                  child: const Text('Save'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 36,
+                      vertical: 12,
+                    ),
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+              ),
             ],
           ),
         ),
       ),
       bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedIndex,
+        selectedIndex: selectedIndex,
         onDestinationSelected: (index) {
           setState(() {
-            _selectedIndex = index;
+            selectedIndex = index;
           });
           onUserDestinationSelected(context, index, widget.user);
         },
@@ -201,7 +224,7 @@ class _ProfilePageState extends State<ProfilePage> {
           NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
           NavigationDestination(
             icon: Icon(Icons.book_online),
-            label: 'Booking',
+            label: 'Bookings',
           ),
           NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
         ],

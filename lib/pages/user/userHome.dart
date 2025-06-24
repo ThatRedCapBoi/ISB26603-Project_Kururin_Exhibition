@@ -15,16 +15,16 @@ class UserHomePage extends StatelessWidget {
     int selectedIndex = 0;
 
     return Scaffold(
-      backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: Text('EventSphere'),
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Colors.white,
       ),
       body: Column(
         children: [
           Padding(
-            padding: EdgeInsets.fromLTRB(16, 24, 16, 8),
+            padding: EdgeInsets.fromLTRB(20, 24, 20, 8),
             child: Column(
               children: [
                 Text(
@@ -63,7 +63,7 @@ class UserHomePage extends StatelessWidget {
           NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
           NavigationDestination(
             icon: Icon(Icons.book_online),
-            label: 'Booking',
+            label: 'Bookings',
           ),
           NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
         ],

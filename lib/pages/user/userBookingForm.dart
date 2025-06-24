@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:Project_Kururin_Exhibition/models/booth_book.dart';
 import 'package:Project_Kururin_Exhibition/models/users.dart'; // This is your custom User model
+
+import 'package:Project_Kururin_Exhibition/widgets/components.dart';
+import 'package:Project_Kururin_Exhibition/pages/user/userNavigation.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart'
     as auth; // <--- CRITICAL FIX: Alias FirebaseAuth
@@ -170,24 +174,35 @@ class _BookingFormPageState extends State<BookingFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    int selectedIndex = 1; // Default to Bookings tab
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEdit ? 'Edit Booking' : 'New Booking'),
+        title: Text('EventSphere'),
         automaticallyImplyLeading: false,
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20),
         child: Form(
           key: _formKey,
           child: ListView(
             children: [
+              Text(
+                isEdit ? 'Edit Booking' : 'New Booking',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ), // Dynamic title based on mode
+              SizedBox(height: 16),
               TextFormField(
                 controller: _boothPackageIDCtrl, // Corrected controller name
                 decoration: const InputDecoration(
-                  labelText:
-                      'Booth Package ID (e.g., small_booth_package)', // Updated label
+                  labelText: 'Booth Package', // Updated label
+                  hintText: ' (e.g., small_booth_package)',
                   border: OutlineInputBorder(),
                 ),
                 validator:
@@ -254,6 +269,23 @@ class _BookingFormPageState extends State<BookingFormPage> {
             ],
           ),
         ),
+      ),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: selectedIndex,
+        onDestinationSelected: (index) {
+          setState(() {
+            selectedIndex = index;
+          });
+          onUserDestinationSelected(context, index, widget.user);
+        },
+        destinations: const [
+          NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
+          NavigationDestination(
+            icon: Icon(Icons.book_online),
+            label: 'Bookings',
+          ),
+          NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
+        ],
       ),
     );
   }
