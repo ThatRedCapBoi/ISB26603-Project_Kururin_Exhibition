@@ -31,16 +31,16 @@ class HomePage extends StatelessWidget {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 24, 16, 8), // Added const
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             child: Column(
               children: [
-                const Text(
+                Text(
                   // Added const
-                  '🎉 Welcome to Kururin Exhibition 🎉',
+                  '🎉Welcome to Kururin Exhibition🎉',
                   style: TextStyle(
-                    fontSize: 26,
+                    fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Colors.deepPurple,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -107,8 +107,6 @@ class HomePage extends StatelessWidget {
   }
 }
 
-// Reusing the BoothCard widget from userHome.dart (make sure this is accessible)
-// You might want to move this into a separate widgets folder or make it a top-level function.
 Widget BoothCard(BuildContext context, BoothPackage booth) {
   return Card(
     margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -124,6 +122,15 @@ Widget BoothCard(BuildContext context, BoothPackage booth) {
           ),
         ),
         ListTile(
+          leading: Text(
+            '\RM${booth.boothPrice.toString()}',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              // backgroundColor: Theme.of(context).colorScheme.primary,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
           title: Text(
             booth.boothName,
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
@@ -139,7 +146,30 @@ Widget BoothCard(BuildContext context, BoothPackage booth) {
               builder:
                   (_) => AlertDialog(
                     title: Text(booth.boothName),
-                    content: Text(booth.boothDescription),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'RM${booth.boothPrice}',
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        Text(
+                          'Decription\n• ${booth.boothDescription}',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        SizedBox(height: 12),
+                        Text(
+                          'Capacity\n• ${booth.boothCapacity}',
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    ),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(context),

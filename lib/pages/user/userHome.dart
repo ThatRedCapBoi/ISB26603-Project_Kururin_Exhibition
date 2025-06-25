@@ -137,6 +137,15 @@ class BoothPackageList extends StatelessWidget {
                       ),
                     ),
                     ListTile(
+                      leading: Text(
+                        'RM${booth.boothPrice.toString()}',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          // backgroundColor: Theme.of(context).colorScheme.primary,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
                       title: Text(
                         booth.boothName,
                         style: TextStyle(
@@ -155,7 +164,30 @@ class BoothPackageList extends StatelessWidget {
                           builder:
                               (_) => AlertDialog(
                                 title: Text(booth.boothName),
-                                content: Text(booth.boothDescription),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'RM${booth.boothPrice}',
+                                      style: const TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+
+                                    Text(
+                                      'Decription\n• ${booth.boothDescription}',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                    SizedBox(height: 12),
+                                    Text(
+                                      'Capacity\n• ${booth.boothCapacity}',
+                                      style: const TextStyle(fontSize: 16),
+                                    ),
+                                  ],
+                                ),
                                 actions: [
                                   TextButton(
                                     onPressed: () => Navigator.pop(context),
