@@ -206,4 +206,8 @@ GeneratedPlugin*
 
 # Sentry Upload
 sentry.properties
+
+# Credentials
 lib/firebase_options.dart
+android/google-services.json
+android/app/google-services.json
