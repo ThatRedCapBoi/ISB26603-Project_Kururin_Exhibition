@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:Project_Kururin_Exhibition/models/booth_book.dart';
 import 'package:Project_Kururin_Exhibition/models/booth.dart';
 import 'package:Project_Kururin_Exhibition/models/users.dart';
+import 'package:Project_Kururin_Exhibition/models/additionalItems.dart';
+
 import 'package:Project_Kururin_Exhibition/pages/user/userNavigation.dart';
 import 'package:Project_Kururin_Exhibition/pages/user/userBookingForm.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -70,6 +72,44 @@ class _BookingListPageState extends State<BookingListPage> {
       print('Error fetching booth package name for $packageId: $e');
       return 'Error Booth';
     }
+  }
+
+  Future<String> _getAdditionalItemName(String itemId) async {
+    try {
+      final docSnapshot =
+          await FirebaseFirestore.instance
+              .collection('additionalItems')
+              .doc(itemId)
+              .get();
+      if (docSnapshot.exists) {
+        final item = AdditionalItem.fromFirestore(docSnapshot);
+        return item.itemName;
+      }
+      return 'Unknown Item';
+    } catch (e) {
+      print('Error fetching additional item name for $itemId: $e');
+      return 'Error Item';
+    }
+  }
+
+  Future<String> _formatAdditionalItems(List<dynamic> items) async {
+    if (items.isEmpty) {
+      return 'None';
+    }
+    List<String> itemStrings = [];
+    for (var itemData in items) {
+      if (itemData is Map<String, dynamic> &&
+          itemData.containsKey('itemID') &&
+          itemData.containsKey('quantity')) {
+        String itemId = itemData['itemID'] as String;
+        int quantity = itemData['quantity'] as int;
+        String itemName = await _getAdditionalItemName(itemId);
+        itemStrings.add('$itemName (x$quantity)');
+      } else if (itemData is String) {
+        itemStrings.add(itemData);
+      }
+    }
+    return itemStrings.join(', ');
   }
 
   Future<User?> _getUserByEmail(String email) async {
@@ -145,6 +185,21 @@ class _BookingListPageState extends State<BookingListPage> {
                       Text("Booking Date: ${booking.bookingDate}"),
                       Text("Event Date: ${booking.eventDate}"),
                       Text("Event Time: ${booking.eventTime}"),
+                      FutureBuilder<String>(
+                        future: _formatAdditionalItems(
+                          booking.selectedAddItems,
+                        ),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Text("Items: Loading...");
+                          } else if (snapshot.hasError) {
+                            return const Text("Items: Error");
+                          } else {
+                            return Text("Items: ${snapshot.data ?? 'None'}");
+                          }
+                        },
+                      ),
                       SizedBox(height: 12),
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -164,9 +219,6 @@ class _BookingListPageState extends State<BookingListPage> {
                           ),
                         ),
                       ),
-                      // Text(
-                      //   "Total Price: RM${booking.totalPrice.toStringAsFixed(2)}",
-                      // ),
                       SizedBox(height: 12),
                     ],
                   ),

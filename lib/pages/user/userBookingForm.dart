@@ -294,9 +294,21 @@ class _BookingFormPageState extends State<BookingFormPage> {
               }).toList(),
               const SizedBox(height: 24),
               ElevatedButton.icon(
-                icon: Icon(isEdit ? Icons.save : Icons.check),
+                icon: Icon(
+                  isEdit ? Icons.save : Icons.check,
+                  color: Colors.white,
+                ),
                 onPressed: _saveBooking,
-                label: Text(isEdit ? 'Update Booking' : 'Submit Booking'),
+                label: Text(
+                  isEdit ? 'Update Booking' : 'Submit Booking',
+                  style: TextStyle(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    color: Colors.white,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                ),
               ),
             ],
           ),
