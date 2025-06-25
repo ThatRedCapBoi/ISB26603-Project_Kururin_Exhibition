@@ -1,8 +1,6 @@
 import 'package:Project_Kururin_Exhibition/pages/homepage.dart';
-import 'package:Project_Kururin_Exhibition/widgets/components.dart';
 import 'package:flutter/material.dart';
 import 'package:Project_Kururin_Exhibition/models/users.dart';
-import 'package:Project_Kururin_Exhibition/pages/login.dart';
 import 'package:Project_Kururin_Exhibition/pages/user/userNavigation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Add this import
 import 'package:firebase_auth/firebase_auth.dart'
@@ -48,8 +46,6 @@ class _ProfilePageState extends State<ProfilePage> {
   void _save() async {
     if (_form.currentState!.validate()) {
       FocusScope.of(context).unfocus(); // Dismiss keyboard
-      // You might want to show a loading indicator here
-      // e.g., setState(() { _isLoading = true; });
 
       final auth.User? firebaseUser = auth.FirebaseAuth.instance.currentUser;
 
@@ -100,9 +96,6 @@ class _ProfilePageState extends State<ProfilePage> {
           const SnackBar(content: Text('Profile updated successfully!')),
         );
 
-        // Optionally, if the user's email was changed, you might want to force a re-login
-        // or guide them to re-login to ensure the auth token is updated.
-        // For simplicity, we'll just pop for now.
         Navigator.pop(context); // Pop back after successful save
       } on auth.FirebaseAuthException catch (e) {
         String message = 'Failed to update profile. ';
@@ -143,21 +136,6 @@ class _ProfilePageState extends State<ProfilePage> {
         automaticallyImplyLeading: false,
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: 'Logout',
-            onPressed: () async {
-              await auth.FirebaseAuth.instance.signOut();
-              if (mounted) {
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => HomePage()),
-                  (route) => false,
-                );
-              }
-            },
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
