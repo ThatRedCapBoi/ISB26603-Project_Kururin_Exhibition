@@ -50,7 +50,7 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => showBoothManagementOptions(context),
+        onPressed: () => showBoothManagementOptions(context, widget.admin),
         tooltip: 'Manage Booths',
         child: const Icon(Icons.meeting_room),
       ),
@@ -339,7 +339,7 @@ Widget boothBookingTable(BuildContext context, {required Admin admin}) {
   return _boothBookingTable(admin: admin);
 }
 
-void showBoothManagementOptions(BuildContext context) {
+void showBoothManagementOptions(BuildContext context, Admin admin) {
   showModalBottomSheet(
     context: context,
     builder: (BuildContext context) {
@@ -367,7 +367,7 @@ void showBoothManagementOptions(BuildContext context) {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const AdminManageBoothsPage(),
+                  builder: (context) => AdminManageBoothsPage(admin: admin),
                 ),
               );
             },
