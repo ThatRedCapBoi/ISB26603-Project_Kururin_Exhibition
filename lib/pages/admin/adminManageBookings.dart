@@ -173,7 +173,7 @@ class _AdminBookingFormPageState extends State<AdminBookingFormPage> {
               TextFormField(
                 controller: _boothPackageIDCtrl,
                 decoration: const InputDecoration(
-                  labelText: 'User ID',
+                  labelText: 'Booth Package',
                   hintText: '(e.g., small_booth_package)',
                   border: OutlineInputBorder(),
                 ),

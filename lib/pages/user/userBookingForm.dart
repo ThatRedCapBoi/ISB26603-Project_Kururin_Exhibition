@@ -22,40 +22,61 @@ class BookingFormPage extends StatefulWidget {
 
 class _BookingFormPageState extends State<BookingFormPage> {
   final _formKey = GlobalKey<FormState>();
-  // Changed _boothCtrl to reflect boothPackageID
   final TextEditingController _boothPackageIDCtrl = TextEditingController();
-  // Changed _dateCtrl to reflect bookingDate (for the form's display of event date)
   final TextEditingController _eventDateCtrl = TextEditingController();
-  // New controller for event time
   final TextEditingController _eventTimeCtrl = TextEditingController();
 
   final List<String> _availableItems = [
-    // Renamed for clarity
     'Extra Chairs',
     'Extra Tables',
     'Lounge Seating',
     'Carpet',
     'Brochure Racks',
   ];
-  List<dynamic> _selectedItems =
-      []; // Changed to dynamic to match model List<dynamic>
+  List<dynamic> _selectedItems = [];
 
-  bool isEdit = false; // Flag to determine if it's an edit or new booking
+  bool isEdit = false;
+
+  // List to hold fetched booth packages
+  List<Map<String, dynamic>> _boothPackages = [];
+  bool _isLoadingPackages = true;
 
   @override
   void initState() {
     super.initState();
+    _fetchBoothPackages();
     if (widget.existingBooking != null) {
       isEdit = true;
-      // Update controllers with existing booking data
-      _boothPackageIDCtrl.text =
-          widget.existingBooking!.boothPackageID; // Corrected field name
-      _eventDateCtrl.text =
-          widget.existingBooking!.eventDate; // Corrected field name
-      _eventTimeCtrl.text = widget.existingBooking!.eventTime; // New field
-      _selectedItems = List.from(
-        widget.existingBooking!.selectedAddItems,
-      ); // Corrected field name
+      _boothPackageIDCtrl.text = widget.existingBooking!.boothPackageID;
+      _eventDateCtrl.text = widget.existingBooking!.eventDate;
+      _eventTimeCtrl.text = widget.existingBooking!.eventTime;
+      _selectedItems = List.from(widget.existingBooking!.selectedAddItems);
+    }
+  }
+
+  Future<void> _fetchBoothPackages() async {
+    try {
+      final snapshot =
+          await FirebaseFirestore.instance.collection('boothPackages').get();
+      setState(() {
+        _boothPackages =
+            snapshot.docs.map((doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              return {
+                'id': doc.id,
+                'name': data['boothName'] ?? doc.id,
+                'price': data['boothPrice'] ?? 0.0,
+              };
+            }).toList();
+        _isLoadingPackages = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoadingPackages = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to fetch booth packages: $e')),
+      );
     }
   }
 
@@ -86,8 +107,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
     );
     if (picked != null) {
       setState(() {
-        _eventDateCtrl.text =
-            "${picked.toLocal()}".split(' ')[0]; // Format date
+        _eventDateCtrl.text = "${picked.toLocal()}".split(' ')[0];
       });
     }
   }
@@ -118,38 +138,31 @@ class _BookingFormPageState extends State<BookingFormPage> {
         return;
       }
 
-      // Default values for new required fields if not explicitly collected
       final String bookingStatus =
           isEdit ? widget.existingBooking!.status : 'Pending';
       final double calculatedTotalPrice =
-          isEdit
-              ? widget.existingBooking!.totalPrice
-              : 0.0; // Implement actual calculation
+          isEdit ? widget.existingBooking!.totalPrice : 0.0;
       final String currentBookingDate =
-          DateTime.now().toIso8601String().split(
-            'T',
-          )[0]; // Current date for booking record
+          DateTime.now().toIso8601String().split('T')[0];
 
       final newBooking = Booking(
-        id: isEdit ? widget.existingBooking?.id : null, // Corrected to 'id'
+        id: isEdit ? widget.existingBooking?.id : null,
         userEmail: userEmail,
-        boothPackageID: _boothPackageIDCtrl.text.trim(), // Corrected field name
-        selectedAddItems: _selectedItems, // Corrected field name
-        bookingDate: currentBookingDate, // Booking creation date
-        eventDate: _eventDateCtrl.text.trim(), // Event date from form
-        eventTime: _eventTimeCtrl.text.trim(), // Event time from form
+        boothPackageID: _boothPackageIDCtrl.text.trim(),
+        selectedAddItems: _selectedItems,
+        bookingDate: currentBookingDate,
+        eventDate: _eventDateCtrl.text.trim(),
+        eventTime: _eventTimeCtrl.text.trim(),
         status: bookingStatus,
         totalPrice: calculatedTotalPrice,
-        userID: widget.user.id!, // Assuming your User model has an 'id' field
+        userID: widget.user.id!,
       );
 
       try {
         final collection = FirebaseFirestore.instance.collection('bookings');
 
         if (isEdit) {
-          await collection
-              .doc(newBooking.id)
-              .update(newBooking.toFirestore()); // Corrected to 'id'
+          await collection.doc(newBooking.id).update(newBooking.toFirestore());
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Booking updated successfully!')),
           );
@@ -159,7 +172,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
             const SnackBar(content: Text('Booking added successfully!')),
           );
         }
-        Navigator.pop(context, true); // Pop and indicate success
+        Navigator.pop(context, true);
       } on FirebaseException catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to save booking: ${e.message}')),
@@ -174,7 +187,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
 
   @override
   Widget build(BuildContext context) {
-    int selectedIndex = 1; // Default to Bookings tab
+    int selectedIndex = 1;
 
     return Scaffold(
       appBar: AppBar(
@@ -196,27 +209,47 @@ class _BookingFormPageState extends State<BookingFormPage> {
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-              ), // Dynamic title based on mode
-              SizedBox(height: 16),
-              TextFormField(
-                controller: _boothPackageIDCtrl, // Corrected controller name
-                decoration: const InputDecoration(
-                  labelText: 'Booth Package', // Updated label
-                  hintText: ' (e.g., small_booth_package)',
-                  border: OutlineInputBorder(),
-                ),
-                validator:
-                    (value) =>
-                        value == null || value.trim().isEmpty
-                            ? 'Please enter booth package ID'
-                            : null,
               ),
+              SizedBox(height: 16),
+
+              // Booth Package Dropdown
+              _isLoadingPackages
+                  ? const Center(child: CircularProgressIndicator())
+                  : DropdownButtonFormField<String>(
+                    value:
+                        _boothPackageIDCtrl.text.isNotEmpty
+                            ? _boothPackageIDCtrl.text
+                            : null,
+                    decoration: const InputDecoration(
+                      labelText: 'Booth Package',
+                      border: OutlineInputBorder(),
+                    ),
+                    items:
+                        _boothPackages
+                            .map(
+                              (pkg) => DropdownMenuItem<String>(
+                                value: pkg['id'],
+                                child: Text(pkg['name'] ?? pkg['id']),
+                              ),
+                            )
+                            .toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _boothPackageIDCtrl.text = value ?? '';
+                      });
+                    },
+                    validator:
+                        (value) =>
+                            value == null || value.trim().isEmpty
+                                ? 'Please select a booth package'
+                                : null,
+                  ),
               const SizedBox(height: 24),
               TextFormField(
-                controller: _eventDateCtrl, // Corrected controller name
+                controller: _eventDateCtrl,
                 readOnly: true,
                 decoration: InputDecoration(
-                  labelText: 'Event Date', // Updated label
+                  labelText: 'Event Date',
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.calendar_today),
@@ -231,10 +264,10 @@ class _BookingFormPageState extends State<BookingFormPage> {
               ),
               const SizedBox(height: 24),
               TextFormField(
-                controller: _eventTimeCtrl, // New controller for time
+                controller: _eventTimeCtrl,
                 readOnly: true,
                 decoration: InputDecoration(
-                  labelText: 'Event Time', // New label
+                  labelText: 'Event Time',
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.access_time),
@@ -253,7 +286,6 @@ class _BookingFormPageState extends State<BookingFormPage> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               ..._availableItems.map((item) {
-                // Corrected list name
                 return CheckboxListTile(
                   title: Text(item),
                   value: _selectedItems.contains(item),

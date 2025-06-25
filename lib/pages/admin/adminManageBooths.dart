@@ -128,7 +128,9 @@ class _EditBoothDialogState extends State<_EditBoothDialog> {
           'boothDescription': _boothDescriptionController.text.trim(),
           'boothCapacity': _boothCapacityController.text.trim(),
           'boothImage': _boothImageController.text.trim(),
-          'boothPrice': _boothPriceController.text.trim(),
+          'boothPrice': int.parse(
+            _boothPriceController.text.trim(),
+          ), // Ensure Parse as number
         };
 
         await FirebaseFirestore.instance
