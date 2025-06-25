@@ -68,12 +68,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
 }
 
-class _userTable extends StatefulWidget {
+class UserTable extends StatefulWidget {
   @override
-  State<_userTable> createState() => _userTableState();
+  State<UserTable> createState() => _userTableState();
 }
 
-class _userTableState extends State<_userTable> {
+class _userTableState extends State<UserTable> {
   // Helper function to show a SnackBar message
   void _showSnackBar(String message, {Color? backgroundColor}) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -156,7 +156,7 @@ class _userTableState extends State<_userTable> {
                                 SizedBox(
                                   width: 120, // Increased width for more space
                                   child: Text(
-                                    user.id?.toString() ?? 'N/A',
+                                    user.id.toString(),
                                     overflow: TextOverflow.visible,
                                   ),
                                 ),
@@ -190,8 +190,8 @@ class _userTableState extends State<_userTable> {
                                   ),
                                   tooltip: 'Delete',
                                   onPressed: () {
-                                    if (user.id != null) {
-                                      _deleteUser(user.id!);
+                                    if (user.id is bool) {
+                                      _deleteUser(user.id);
                                     } else {
                                       _showSnackBar(
                                         'User ID is missing.',
@@ -215,5 +215,5 @@ class _userTableState extends State<_userTable> {
 }
 
 Widget usertable(BuildContext context) {
-  return _userTable();
+  return UserTable();
 }

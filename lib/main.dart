@@ -5,7 +5,8 @@ import 'package:firebase_core/firebase_core.dart'; // Import Firebase Core
 import "common/theme.dart";
 
 // Make main an async function
-void main() async { // Add 'async' keyword here
+void main() async {
+  // Add 'async' keyword here
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(); // Initialize Firebase here
   runApp(const MainApp());
@@ -18,6 +19,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Kururin Exhibition',
+      debugShowCheckedModeBanner: false,
       theme: appTheme,
       // home: const demoHomePage(title: ' Kururin Exhibition - Sitemap Demo'),
       home: HomePage(),

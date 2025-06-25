@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:Project_Kururin_Exhibition/models/users.dart';
 import 'package:Project_Kururin_Exhibition/pages/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; 
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({super.key});
@@ -60,11 +59,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
     try {
       // 1. Create user in Firebase Authentication
-      UserCredential userCredential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
 
       String uid = userCredential.user!.uid; // Get the UID from Firebase Auth
 
@@ -76,9 +72,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
         'username': name, // As per your Firestore data structure
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registration successful!')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Registration successful!')));
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const LoginPage()),
@@ -92,13 +88,15 @@ class _RegistrationPageState extends State<RegistrationPage> {
       } else if (e.code == 'invalid-email') {
         message = 'The email address is not valid.';
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
       print('Firebase Auth Error: ${e.code} - ${e.message}');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An unexpected error occurred: ${e.toString()}')),
+        SnackBar(
+          content: Text('An unexpected error occurred: ${e.toString()}'),
+        ),
       );
       print('Registration error: $e');
     } finally {
@@ -118,7 +116,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
           children: [
             TextField(
               controller: nameCtrl,
-              decoration: const InputDecoration(labelText: 'Username'), // Matches Firestore 'username' field
+              decoration: const InputDecoration(
+                labelText: 'Username',
+              ), // Matches Firestore 'username' field
             ),
             TextField(
               controller: emailCtrl,
@@ -168,14 +168,15 @@ class _RegistrationPageState extends State<RegistrationPage> {
             _isLoading
                 ? const CircularProgressIndicator()
                 : ElevatedButton(
-                    onPressed: _register,
-                    child: const Text('Register'),
-                  ),
+                  onPressed: _register,
+                  child: const Text('Register'),
+                ),
             TextButton(
-              onPressed: () => Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const LoginPage()),
-              ),
+              onPressed:
+                  () => Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginPage()),
+                  ),
               child: const Text('Already have an account? Login'),
             ),
           ],

@@ -6,7 +6,6 @@ import 'package:Project_Kururin_Exhibition/models/booth.dart';
 import 'package:Project_Kururin_Exhibition/models/users.dart';
 import 'package:Project_Kururin_Exhibition/pages/user/userNavigation.dart';
 
-import 'package:cloud_firestore/cloud_firestore.dart'; // Add this import
 import 'package:firebase_auth/firebase_auth.dart'
     as auth; // Alias for FirebaseAuth
 

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:Project_Kururin_Exhibition/models/booth_book.dart';
 import 'package:Project_Kururin_Exhibition/models/users.dart'; // This is your custom User model
 
-import 'package:Project_Kururin_Exhibition/widgets/components.dart';
 import 'package:Project_Kururin_Exhibition/pages/user/userNavigation.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -61,7 +60,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
       setState(() {
         _boothPackages =
             snapshot.docs.map((doc) {
-              final data = doc.data() as Map<String, dynamic>;
+              final data = doc.data();
               return {
                 'id': doc.id,
                 'name': data['boothName'] ?? doc.id,
@@ -155,7 +154,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
         eventTime: _eventTimeCtrl.text.trim(),
         status: bookingStatus,
         totalPrice: calculatedTotalPrice,
-        userID: widget.user.id!,
+        userID: widget.user.id,
       );
 
       try {
@@ -291,7 +290,7 @@ class _BookingFormPageState extends State<BookingFormPage> {
                   value: _selectedItems.contains(item),
                   onChanged: (value) => _toggleItem(item, value),
                 );
-              }).toList(),
+              }),
               const SizedBox(height: 24),
               ElevatedButton.icon(
                 icon: Icon(

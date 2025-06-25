@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:Project_Kururin_Exhibition/pages/admin/adminNavigation.dart';
 import 'package:Project_Kururin_Exhibition/models/booth_book.dart';
 import 'package:Project_Kururin_Exhibition/models/admin.dart';
-import 'package:Project_Kururin_Exhibition/pages/user/userBookingForm.dart';
 import 'package:Project_Kururin_Exhibition/models/users.dart';
 import 'package:Project_Kururin_Exhibition/models/booth.dart';
 import 'package:Project_Kururin_Exhibition/models/additionalItems.dart';
@@ -75,7 +74,7 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
 
 class _boothBookingTable extends StatefulWidget {
   final Admin admin;
-  const _boothBookingTable({super.key, required this.admin});
+  const _boothBookingTable({required this.admin});
 
   @override
   State<_boothBookingTable> createState() => _boothBookingTableState();
@@ -225,7 +224,7 @@ class _boothBookingTableState extends State<_boothBookingTable> {
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("User ID: ${booking.userID ?? 'N/A'}"),
+                      Text("User ID: ${booking.userID}"),
                       Text("User Email: ${booking.userEmail ?? 'N/A'}"),
                       Text("Booking Date: ${booking.bookingDate}"),
                       Text("Event Date: ${booking.eventDate}"),
@@ -258,7 +257,6 @@ class _boothBookingTableState extends State<_boothBookingTable> {
                         icon: const Icon(Icons.edit),
                         onPressed: () async {
                           User? user;
-                          Admin? admin;
                           if (booking.userID.isNotEmpty) {
                             try {
                               DocumentSnapshot userDoc =

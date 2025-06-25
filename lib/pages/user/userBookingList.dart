@@ -7,7 +7,6 @@ import 'package:Project_Kururin_Exhibition/models/additionalItems.dart';
 import 'package:Project_Kururin_Exhibition/pages/user/userNavigation.dart';
 import 'package:Project_Kururin_Exhibition/pages/user/userBookingForm.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart' as auth;
 
 class BookingListPage extends StatefulWidget {
   final User user;
@@ -38,22 +37,6 @@ class _BookingListPageState extends State<BookingListPage> {
           (snapshot) =>
               snapshot.docs.map((doc) => Booking.fromFirestore(doc)).toList(),
         );
-  }
-
-  Future<void> _deleteBooking(String bookingId) async {
-    try {
-      await FirebaseFirestore.instance
-          .collection('bookings')
-          .doc(bookingId)
-          .delete();
-      _showSnackBar('Booking deleted successfully.');
-    } catch (e) {
-      _showSnackBar(
-        'Failed to delete booking: $e',
-        backgroundColor: Colors.red,
-      );
-      print('Error deleting booking: $e');
-    }
   }
 
   Future<String> _getBoothPackageName(String packageId) async {

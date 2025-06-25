@@ -83,8 +83,6 @@ class _AdminHomePageState extends State<AdminHomePage> {
 }
 
 class _ExpandableCard extends StatefulWidget {
-  const _ExpandableCard({super.key});
-
   @override
   State<_ExpandableCard> createState() => _ExpandableCardState();
 }

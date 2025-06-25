@@ -63,30 +63,28 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
 }
 
 class _AdminTable extends StatefulWidget {
-  const _AdminTable({super.key});
-
   @override
   State<_AdminTable> createState() => _AdminTableState();
 }
 
 class _AdminTableState extends State<_AdminTable> {
   // Method to delete an admin from Firestore
-  Future<void> _deleteAdmin(String adminId) async {
-    try {
-      await FirebaseFirestore.instance
-          .collection('administrators')
-          .doc(adminId)
-          .delete();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Admin deleted successfully!')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to delete admin: ${e.toString()}')),
-      );
-      print('Error deleting admin: $e');
-    }
-  }
+  // Future<void> _deleteAdmin(String adminId) async {
+  //   try {
+  //     await FirebaseFirestore.instance
+  //         .collection('administrators')
+  //         .doc(adminId)
+  //         .delete();
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text('Admin deleted successfully!')),
+  //     );
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Failed to delete admin: ${e.toString()}')),
+  //     );
+  //     print('Error deleting admin: $e');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -174,5 +172,5 @@ class _AdminTableState extends State<_AdminTable> {
 }
 
 Widget adminTable(BuildContext context) {
-  return const _AdminTable(); // Use the new StatefulWidget
+  return _AdminTable(); // Use the new StatefulWidget
 }
