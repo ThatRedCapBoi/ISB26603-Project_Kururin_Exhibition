@@ -113,12 +113,28 @@ class _BookingListPageState extends State<BookingListPage> {
                     future: _getBoothPackageName(booking.boothPackageID),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Text("Booth: Loading...");
+                        return const Text(
+                          "Booth: Loading...",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        );
                       } else if (snapshot.hasError) {
-                        return const Text("Booth: Error");
+                        return const Text(
+                          "Booth: Error",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        );
                       } else {
                         return Text(
                           "Booth: ${snapshot.data ?? 'Unknown Booth'}",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         );
                       }
                     },
@@ -129,10 +145,29 @@ class _BookingListPageState extends State<BookingListPage> {
                       Text("Booking Date: ${booking.bookingDate}"),
                       Text("Event Date: ${booking.eventDate}"),
                       Text("Event Time: ${booking.eventTime}"),
-                      Text("Status: ${booking.status}"),
-                      Text(
-                        "Total Price: RM${booking.totalPrice.toStringAsFixed(2)}",
+                      SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.deepPurple.shade200,
+
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          "Status: ${booking.status}",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
+                      // Text(
+                      //   "Total Price: RM${booking.totalPrice.toStringAsFixed(2)}",
+                      // ),
+                      SizedBox(height: 12),
                     ],
                   ),
                   trailing: Row(

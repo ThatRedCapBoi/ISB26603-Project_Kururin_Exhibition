@@ -4,7 +4,7 @@ final appTheme = ThemeData(
   colorScheme: ColorScheme.fromSeed(
     seedColor: Colors.deepPurple,
     primary: Colors.deepPurple,
-    secondary: Colors.deepPurpleAccent,
+    secondary: Colors.purple.shade200,
     tertiary: Colors.black,
   ),
   useMaterial3: true,
