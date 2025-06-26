@@ -132,7 +132,16 @@ class BoothPackageList extends StatelessWidget {
                       ),
                       child: AspectRatio(
                         aspectRatio: 3 / 2,
-                        child: Image.asset(booth.boothImage, fit: BoxFit.cover),
+                        child:
+                            booth.boothImage.startsWith('http')
+                                ? Image.network(
+                                  booth.boothImage,
+                                  fit: BoxFit.cover,
+                                )
+                                : Image.asset(
+                                  booth.boothImage,
+                                  fit: BoxFit.cover,
+                                ),
                       ),
                     ),
                     ListTile(
