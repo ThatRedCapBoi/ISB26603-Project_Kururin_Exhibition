@@ -23,8 +23,10 @@ class _BookingFormPageState extends State<BookingFormPage> {
   final TextEditingController _eventDateCtrl = TextEditingController();
   final TextEditingController _eventTimeCtrl = TextEditingController();
 
-  List<String> _availableItems = []; // This will now hold names of additional items
-  List<AdditionalItem> _availableAdditionalItems = []; // To store fetched AdditionalItem objects
+  List<String> _availableItems =
+      []; // This will now hold names of additional items
+  List<AdditionalItem> _availableAdditionalItems =
+      []; // To store fetched AdditionalItem objects
   List<dynamic> _selectedItems = []; // Stores names of selected items
   double _totalPrice = 0.0; // State variable to hold the calculated total price
 
@@ -46,9 +48,13 @@ class _BookingFormPageState extends State<BookingFormPage> {
       _eventDateCtrl.text = widget.existingBooking!.eventDate;
       _eventTimeCtrl.text = widget.existingBooking!.eventTime;
       _selectedItems = List.from(widget.existingBooking!.selectedAddItems);
-      _totalPrice = widget.existingBooking!.totalPrice; // Initialize with existing total price
+      _totalPrice =
+          widget
+              .existingBooking!
+              .totalPrice; // Initialize with existing total price
     } else {
-      _boothPackageIDCtrl.text = ''; // Initialize to empty for new bookings to force selection
+      _boothPackageIDCtrl.text =
+          ''; // Initialize to empty for new bookings to force selection
     }
     // _calculateTotalPrice will be called after booth packages and additional items are loaded
   }
@@ -64,12 +70,16 @@ class _BookingFormPageState extends State<BookingFormPage> {
               return {
                 'id': doc.id,
                 'name': data['boothName'] ?? doc.id,
-                'price': (data['boothPrice'] ?? 0).toDouble(), // Ensure price is double
+                'price':
+                    (data['boothPrice'] ?? 0)
+                        .toDouble(), // Ensure price is double
               };
             }).toList();
         _isLoadingPackages = false;
         // If it's a new booking, set a default selected booth package ID if available
-        if (!isEdit && _boothPackages.isNotEmpty && _boothPackageIDCtrl.text.isEmpty) {
+        if (!isEdit &&
+            _boothPackages.isNotEmpty &&
+            _boothPackageIDCtrl.text.isEmpty) {
           _boothPackageIDCtrl.text = _boothPackages.first['id'];
         }
         _calculateTotalPrice(); // Recalculate after packages are loaded
@@ -87,11 +97,16 @@ class _BookingFormPageState extends State<BookingFormPage> {
   Future<void> _fetchAdditionalItems() async {
     try {
       final snapshot =
-          await FirebaseFirestore.instance.collection('additionalItems').get(); //
+          await FirebaseFirestore.instance
+              .collection('additionalItems')
+              .get(); //
       setState(() {
         _availableAdditionalItems =
-            snapshot.docs.map((doc) => AdditionalItem.fromFirestore(doc)).toList();
-        _availableItems = _availableAdditionalItems.map((item) => item.itemName).toList();
+            snapshot.docs
+                .map((doc) => AdditionalItem.fromFirestore(doc))
+                .toList();
+        _availableItems =
+            _availableAdditionalItems.map((item) => item.itemName).toList();
         _isLoadingAdditionalItems = false;
         _calculateTotalPrice(); // Recalculate after additional items are loaded
       });
@@ -145,7 +160,12 @@ class _BookingFormPageState extends State<BookingFormPage> {
     for (String selectedItemName in _selectedItems) {
       final item = _availableAdditionalItems.firstWhere(
         (additionalItem) => additionalItem.itemName == selectedItemName,
-        orElse: () => AdditionalItem(itemName: '', description: '', price: 0.0), // Default to 0 if not found
+        orElse:
+            () => AdditionalItem(
+              itemName: '',
+              description: '',
+              price: 0.0,
+            ), // Default to 0 if not found
       );
       currentTotal += item.price;
     }
@@ -282,7 +302,9 @@ class _BookingFormPageState extends State<BookingFormPage> {
                             .map(
                               (pkg) => DropdownMenuItem<String>(
                                 value: pkg['id'],
-                                child: Text('${pkg['name']} (RM ${pkg['price'].toStringAsFixed(2)})'),
+                                child: Text(
+                                  '${pkg['name']} (RM ${pkg['price'].toStringAsFixed(2)})',
+                                ),
                               ),
                             )
                             .toList(),
@@ -342,19 +364,27 @@ class _BookingFormPageState extends State<BookingFormPage> {
               _isLoadingAdditionalItems
                   ? const Center(child: CircularProgressIndicator())
                   : Column(
-                      children: _availableItems.map((item) {
-                        return CheckboxListTile(
-                          title: Text(item),
-                          value: _selectedItems.contains(item),
-                          onChanged: (value) => _toggleItem(item, value),
-                        );
-                      }).toList(),
-                    ),
+                    children:
+                        _availableItems.map((item) {
+                          return CheckboxListTile(
+                            title: Text(item),
+                            subtitle: Text(
+                              '+ RM ${_availableAdditionalItems.firstWhere((additionalItem) => additionalItem.itemName == item, orElse: () => AdditionalItem(itemName: '', description: '', price: 0.0)).price.toStringAsFixed(2)}',
+                            ),
+                            value: _selectedItems.contains(item),
+                            onChanged: (value) => _toggleItem(item, value),
+                          );
+                        }).toList(),
+                  ),
               const SizedBox(height: 24),
               // Display the calculated total price
               Text(
                 'Total Price: RM ${_totalPrice.toStringAsFixed(2)}',
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.green),
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green.shade800,
+                ),
               ),
               const SizedBox(height: 24),
               ElevatedButton.icon(

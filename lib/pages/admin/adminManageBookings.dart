@@ -33,8 +33,10 @@ class _AdminBookingFormPageState extends State<AdminBookingFormPage> {
   final List<String> _statusOptions = ['Pending', 'Confirmed', 'Rejected'];
   // --- END NEW ---
 
-  List<String> _availableItems = []; // This will hold names of fetched additional items
-  List<AdditionalItem> _availableAdditionalItems = []; // To store fetched AdditionalItem objects
+  List<String> _availableItems =
+      []; // This will hold names of fetched additional items
+  List<AdditionalItem> _availableAdditionalItems =
+      []; // To store fetched AdditionalItem objects
   List<dynamic> _selectedItems = []; // Stores names of selected items
 
   double _totalPrice = 0.0; // State variable for total price
@@ -44,7 +46,6 @@ class _AdminBookingFormPageState extends State<AdminBookingFormPage> {
   List<Map<String, dynamic>> _boothPackages = [];
   bool _isLoadingPackages = true;
   bool _isLoadingAdditionalItems = true;
-
 
   @override
   void initState() {
@@ -62,7 +63,8 @@ class _AdminBookingFormPageState extends State<AdminBookingFormPage> {
       _selectedItems = List.from(widget.existingBooking!.selectedAddItems);
       _totalPrice = widget.existingBooking!.totalPrice;
     } else {
-      _boothPackageIDCtrl.text = ''; // Initialize to empty for new bookings to force selection
+      _boothPackageIDCtrl.text =
+          ''; // Initialize to empty for new bookings to force selection
       _selectedStatus = 'Pending'; // Default status for new bookings
     }
     // _calculateTotalPrice will be called after booth packages and additional items are loaded
@@ -82,16 +84,19 @@ class _AdminBookingFormPageState extends State<AdminBookingFormPage> {
       final snapshot =
           await FirebaseFirestore.instance.collection('boothPackages').get();
       setState(() {
-        _boothPackages = snapshot.docs.map((doc) {
-          final data = doc.data();
-          return {
-            'id': doc.id,
-            'name': data['boothName'] ?? doc.id,
-            'price': (data['boothPrice'] ?? 0).toDouble(),
-          };
-        }).toList();
+        _boothPackages =
+            snapshot.docs.map((doc) {
+              final data = doc.data();
+              return {
+                'id': doc.id,
+                'name': data['boothName'] ?? doc.id,
+                'price': (data['boothPrice'] ?? 0).toDouble(),
+              };
+            }).toList();
         _isLoadingPackages = false;
-        if (!isEdit && _boothPackages.isNotEmpty && _boothPackageIDCtrl.text.isEmpty) {
+        if (!isEdit &&
+            _boothPackages.isNotEmpty &&
+            _boothPackageIDCtrl.text.isEmpty) {
           _boothPackageIDCtrl.text = _boothPackages.first['id'];
         }
         _calculateTotalPrice(); // Recalculate after packages are loaded
@@ -113,8 +118,11 @@ class _AdminBookingFormPageState extends State<AdminBookingFormPage> {
           await FirebaseFirestore.instance.collection('additionalItems').get();
       setState(() {
         _availableAdditionalItems =
-            snapshot.docs.map((doc) => AdditionalItem.fromFirestore(doc)).toList();
-        _availableItems = _availableAdditionalItems.map((item) => item.itemName).toList();
+            snapshot.docs
+                .map((doc) => AdditionalItem.fromFirestore(doc))
+                .toList();
+        _availableItems =
+            _availableAdditionalItems.map((item) => item.itemName).toList();
         _isLoadingAdditionalItems = false;
         _calculateTotalPrice(); // Recalculate after additional items are loaded
       });
@@ -202,11 +210,13 @@ class _AdminBookingFormPageState extends State<AdminBookingFormPage> {
 
       // Use _selectedStatus directly
       final String bookingStatus = _selectedStatus ?? 'Pending';
-      final String currentBookingDate = DateTime.now().toIso8601String().split('T')[0];
+      final String currentBookingDate =
+          DateTime.now().toIso8601String().split('T')[0];
 
       final updatedBooking = Booking(
         id: widget.existingBooking?.id,
-        userEmail: widget.existingBooking?.userEmail, // Retain existing user email
+        userEmail:
+            widget.existingBooking?.userEmail, // Retain existing user email
         boothPackageID: _boothPackageIDCtrl.text.trim(),
         selectedAddItems: _selectedItems,
         bookingDate: currentBookingDate,
@@ -221,13 +231,17 @@ class _AdminBookingFormPageState extends State<AdminBookingFormPage> {
         final collection = FirebaseFirestore.instance.collection('bookings');
 
         if (isEdit) {
-          await collection.doc(updatedBooking.id).update(updatedBooking.toFirestore());
+          await collection
+              .doc(updatedBooking.id)
+              .update(updatedBooking.toFirestore());
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Booking updated successfully!')),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('This form is for editing existing bookings.')),
+            const SnackBar(
+              content: Text('This form is for editing existing bookings.'),
+            ),
           );
           return;
         }
@@ -273,18 +287,22 @@ class _AdminBookingFormPageState extends State<AdminBookingFormPage> {
               _isLoadingPackages
                   ? const Center(child: CircularProgressIndicator())
                   : DropdownButtonFormField<String>(
-                    value: _boothPackageIDCtrl.text.isNotEmpty
+                    value:
+                        _boothPackageIDCtrl.text.isNotEmpty
                             ? _boothPackageIDCtrl.text
                             : null,
                     decoration: const InputDecoration(
                       labelText: 'Booth Package',
                       border: OutlineInputBorder(),
                     ),
-                    items: _boothPackages
+                    items:
+                        _boothPackages
                             .map(
                               (pkg) => DropdownMenuItem<String>(
                                 value: pkg['id'],
-                                child: Text('${pkg['name']} (RM ${pkg['price'].toStringAsFixed(2)})'),
+                                child: Text(
+                                  '${pkg['name']} (RM ${pkg['price'].toStringAsFixed(2)})',
+                                ),
                               ),
                             )
                             .toList(),
@@ -294,7 +312,9 @@ class _AdminBookingFormPageState extends State<AdminBookingFormPage> {
                       });
                       _calculateTotalPrice(); // Recalculate when booth package changes
                     },
-                    validator: (value) => value == null || value.trim().isEmpty
+                    validator:
+                        (value) =>
+                            value == null || value.trim().isEmpty
                                 ? 'Please select a booth package'
                                 : null,
                   ),
@@ -310,7 +330,9 @@ class _AdminBookingFormPageState extends State<AdminBookingFormPage> {
                     onPressed: () => _selectDate(context),
                   ),
                 ),
-                validator: (value) => value == null || value.trim().isEmpty
+                validator:
+                    (value) =>
+                        value == null || value.trim().isEmpty
                             ? 'Please select an event date'
                             : null,
               ),
@@ -326,7 +348,9 @@ class _AdminBookingFormPageState extends State<AdminBookingFormPage> {
                     onPressed: () => _selectTime(context),
                   ),
                 ),
-                validator: (value) => value == null || value.trim().isEmpty
+                validator:
+                    (value) =>
+                        value == null || value.trim().isEmpty
                             ? 'Please select an event time'
                             : null,
               ),
@@ -338,12 +362,13 @@ class _AdminBookingFormPageState extends State<AdminBookingFormPage> {
                   labelText: 'Booking Status',
                   border: OutlineInputBorder(),
                 ),
-                items: _statusOptions.map((String status) {
-                  return DropdownMenuItem<String>(
-                    value: status,
-                    child: Text(status),
-                  );
-                }).toList(),
+                items:
+                    _statusOptions.map((String status) {
+                      return DropdownMenuItem<String>(
+                        value: status,
+                        child: Text(status),
+                      );
+                    }).toList(),
                 onChanged: (String? newValue) {
                   setState(() {
                     _selectedStatus = newValue;
@@ -365,23 +390,34 @@ class _AdminBookingFormPageState extends State<AdminBookingFormPage> {
               _isLoadingAdditionalItems
                   ? const Center(child: CircularProgressIndicator())
                   : Column(
-                      children: _availableItems.map((item) {
-                        return CheckboxListTile(
-                          title: Text(item),
-                          value: _selectedItems.contains(item),
-                          onChanged: (value) => _toggleItem(item, value),
-                        );
-                      }).toList(),
-                    ),
+                    children:
+                        _availableItems.map((item) {
+                          return CheckboxListTile(
+                            title: Text(item),
+                            subtitle: Text(
+                              '+ RM ${_availableAdditionalItems.firstWhere((additionalItem) => additionalItem.itemName == item, orElse: () => AdditionalItem(itemName: '', description: '', price: 0.0)).price.toStringAsFixed(2)}',
+                            ),
+                            value: _selectedItems.contains(item),
+                            onChanged: (value) => _toggleItem(item, value),
+                          );
+                        }).toList(),
+                  ),
               const SizedBox(height: 24),
               // Display the calculated total price
               Text(
                 'Total Price: RM ${_totalPrice.toStringAsFixed(2)}',
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.green),
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green.shade800,
+                ),
               ),
               const SizedBox(height: 24),
               ElevatedButton.icon(
-                icon: Icon(isEdit ? Icons.save : Icons.check, color: Colors.white),
+                icon: Icon(
+                  isEdit ? Icons.save : Icons.check,
+                  color: Colors.white,
+                ),
                 onPressed: _saveBooking,
                 label: Text(
                   isEdit ? 'Update Booking' : 'Submit Booking',
