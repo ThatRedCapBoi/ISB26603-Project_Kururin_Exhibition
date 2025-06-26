@@ -224,7 +224,8 @@ class _userTableState extends State<UserTable> {
                                   ),
                                   tooltip: 'Delete',
                                   onPressed: () {
-                                    if (user.id is bool) {
+                                    if (user.id != null &&
+                                        user.id.toString().isNotEmpty) {
                                       _deleteUser(user.id);
                                     } else {
                                       _showSnackBar(

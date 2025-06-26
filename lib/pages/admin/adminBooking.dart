@@ -4,12 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:Project_Kururin_Exhibition/pages/admin/adminNavigation.dart';
 import 'package:Project_Kururin_Exhibition/models/booth_book.dart';
 import 'package:Project_Kururin_Exhibition/models/admin.dart';
-import 'package:Project_Kururin_Exhibition/models/users.dart';
-import 'package:Project_Kururin_Exhibition/models/booth.dart';
-import 'package:Project_Kururin_Exhibition/models/additionalItems.dart';
 import 'package:Project_Kururin_Exhibition/pages/admin/adminAddBooth.dart';
 import 'package:Project_Kururin_Exhibition/pages/admin/adminManageBooths.dart';
-// Import the new page for adding additional items
 import 'package:Project_Kururin_Exhibition/pages/admin/adminAddAdditionalItem.dart'; // <--- ADD THIS LINE
 
 class AdminBookingPage extends StatefulWidget {
@@ -54,9 +50,7 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
               ),
             ),
             const SizedBox(height: 16),
-            Expanded(
-              child: _boothBookingTable(admin: widget.admin),
-            ),
+            Expanded(child: _boothBookingTable(admin: widget.admin)),
           ],
         ),
       ),
@@ -105,7 +99,10 @@ class __boothBookingTableState extends State<_boothBookingTable> {
           return const Center(child: Text('No bookings found.'));
         }
 
-        final bookings = snapshot.data!.docs.map((doc) => Booking.fromFirestore(doc)).toList();
+        final bookings =
+            snapshot.data!.docs
+                .map((doc) => Booking.fromFirestore(doc))
+                .toList();
 
         return ListView.builder(
           itemCount: bookings.length,
@@ -129,10 +126,11 @@ class __boothBookingTableState extends State<_boothBookingTable> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => AdminBookingFormPage(
-                          admin: widget.admin,
-                          existingBooking: booking,
-                        ),
+                        builder:
+                            (context) => AdminBookingFormPage(
+                              admin: widget.admin,
+                              existingBooking: booking,
+                            ),
                       ),
                     );
                   },
@@ -180,7 +178,8 @@ void showBoothManagementOptions(BuildContext context, Admin admin) {
               );
             },
           ),
-          ListTile( // <--- ADD THIS NEW LIST TILE FOR ADDITIONAL ITEMS
+          ListTile(
+            // <--- ADD THIS NEW LIST TILE FOR ADDITIONAL ITEMS
             leading: const Icon(Icons.library_add), // Choose a suitable icon
             title: const Text('Add New Additional Item'),
             onTap: () {
@@ -188,7 +187,9 @@ void showBoothManagementOptions(BuildContext context, Admin admin) {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const AdminAddAdditionalItemPage(), // Navigate to the new page
+                  builder:
+                      (context) =>
+                          const AdminAddAdditionalItemPage(), // Navigate to the new page
                 ),
               );
             },
