@@ -3,19 +3,20 @@ import 'package:Project_Kururin_Exhibition/models/admin.dart';
 import 'package:Project_Kururin_Exhibition/models/users.dart'
     as my_models; // Alias to avoid conflict with FirebaseAuth.User
 import 'package:Project_Kururin_Exhibition/pages/admin/adminNavigation.dart'; // Assuming this provides onAdminDestinationSelected
+import 'package:Project_Kururin_Exhibition/pages/admin/adminManageUser.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class AdminDashboard extends StatefulWidget {
+class AdminUserManagementPage extends StatefulWidget {
   final Admin admin;
 
-  const AdminDashboard({super.key, required this.admin});
+  const AdminUserManagementPage({super.key, required this.admin});
 
   @override
-  State<AdminDashboard> createState() => _AdminDashboardState();
+  State<AdminUserManagementPage> createState() => _AdminUserManagementState();
 }
 
-class _AdminDashboardState extends State<AdminDashboard> {
+class _AdminUserManagementState extends State<AdminUserManagementPage> {
   int _selectedIndex = 1;
 
   @override
@@ -44,7 +45,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
               textAlign: TextAlign.left,
             ),
             Expanded(
-              child: usertable(context), // Call the usertable function
+              child: UserTable(
+                admin: widget.admin,
+              ), // Call the usertable function
             ),
           ],
         ),
@@ -69,6 +72,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
 }
 
 class UserTable extends StatefulWidget {
+  final Admin admin;
+  const UserTable({super.key, required this.admin});
+
   @override
   State<UserTable> createState() => _userTableState();
 }
@@ -118,6 +124,7 @@ class _userTableState extends State<UserTable> {
           return const Center(child: Text('No users found.'));
         } else {
           final users = snapshot.data!;
+
           return SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: SingleChildScrollView(
@@ -145,6 +152,7 @@ class _userTableState extends State<UserTable> {
                       child: Text('Phone', overflow: TextOverflow.ellipsis),
                     ),
                   ),
+                  DataColumn(label: SizedBox(width: 24)),
                   DataColumn(label: SizedBox(width: 24)),
                 ],
                 rows:
@@ -184,6 +192,32 @@ class _userTableState extends State<UserTable> {
                               ),
                               DataCell(
                                 IconButton(
+                                  icon: const Icon(Icons.edit),
+                                  tooltip: 'Edit',
+                                  onPressed: () {
+                                    if (user.id != null &&
+                                        user.id.toString().isNotEmpty) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) => AdminManageUser(
+                                                admin: widget.admin,
+                                                user: user,
+                                              ),
+                                        ),
+                                      );
+                                    } else {
+                                      _showSnackBar(
+                                        'User ID is missing.',
+                                        backgroundColor: Colors.orange,
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
+                              DataCell(
+                                IconButton(
                                   icon: const Icon(
                                     Icons.delete,
                                     color: Colors.red,
@@ -214,6 +248,6 @@ class _userTableState extends State<UserTable> {
   }
 }
 
-Widget usertable(BuildContext context) {
-  return UserTable();
+Widget usertable(BuildContext context, {required Admin admin}) {
+  return UserTable(admin: admin);
 }
