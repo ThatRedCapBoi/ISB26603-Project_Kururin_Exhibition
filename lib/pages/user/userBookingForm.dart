@@ -4,7 +4,6 @@ import 'package:Project_Kururin_Exhibition/models/users.dart';
 import 'package:Project_Kururin_Exhibition/pages/user/userNavigation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
-import 'package:Project_Kururin_Exhibition/models/booth.dart'; // Import your BoothPackage model
 import 'package:Project_Kururin_Exhibition/models/additionalItems.dart'; // Import your AdditionalItem model
 
 class BookingFormPage extends StatefulWidget {

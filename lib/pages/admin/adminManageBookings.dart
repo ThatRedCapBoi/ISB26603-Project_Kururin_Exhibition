@@ -3,7 +3,6 @@ import 'package:Project_Kururin_Exhibition/models/admin.dart';
 import 'package:Project_Kururin_Exhibition/models/booth_book.dart';
 import 'package:Project_Kururin_Exhibition/pages/admin/adminNavigation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:Project_Kururin_Exhibition/models/booth.dart'; // Import your BoothPackage model
 import 'package:Project_Kururin_Exhibition/models/additionalItems.dart'; // Import your AdditionalItem model
 
 class AdminBookingFormPage extends StatefulWidget {

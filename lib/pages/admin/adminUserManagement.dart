@@ -195,8 +195,7 @@ class _userTableState extends State<UserTable> {
                                   icon: const Icon(Icons.edit),
                                   tooltip: 'Edit',
                                   onPressed: () {
-                                    if (user.id != null &&
-                                        user.id.toString().isNotEmpty) {
+                                    if (user.id.toString().isNotEmpty) {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -224,8 +223,7 @@ class _userTableState extends State<UserTable> {
                                   ),
                                   tooltip: 'Delete',
                                   onPressed: () {
-                                    if (user.id != null &&
-                                        user.id.toString().isNotEmpty) {
+                                    if (user.id.toString().isNotEmpty) {
                                       _deleteUser(user.id);
                                     } else {
                                       _showSnackBar(
