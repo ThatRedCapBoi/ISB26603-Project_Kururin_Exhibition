@@ -28,13 +28,13 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
         automaticallyImplyLeading: false,
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.tune), // Or a more suitable icon
-            onPressed: () => showBoothManagementOptions(context, widget.admin),
-            tooltip: 'Manage Booths & Items',
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.tune), // Or a more suitable icon
+        //     onPressed: () => showBoothManagementOptions(context, widget.admin),
+        //     tooltip: 'Manage Booths & Items',
+        //   ),
+        // ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -54,6 +54,12 @@ class _AdminBookingPageState extends State<AdminBookingPage> {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => showBoothManagementOptions(context, widget.admin),
+        tooltip: 'Manage Booths & Items',
+        child: Icon(Icons.add_business),
+      ),
+
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: (index) {
@@ -111,13 +117,49 @@ class __boothBookingTableState extends State<_boothBookingTable> {
             return Card(
               margin: const EdgeInsets.symmetric(vertical: 8.0),
               child: ListTile(
-                title: Text('Booking ID: ${booking.id ?? 'N/A'}'),
-                subtitle: Text(
-                  'User: ${booking.userEmail}\n'
-                  'Booth: ${booking.boothPackageID}\n'
-                  'Date: ${booking.eventDate} ${booking.eventTime}\n'
-                  'Total Price: RM ${booking.totalPrice.toStringAsFixed(2)}\n'
-                  'Status: ${booking.status}',
+                title: Text(
+                  'Booking ID: ${booking.id ?? 'N/A'}',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('User: ${booking.userEmail}'),
+                    Text('Booth ID: ${booking.boothPackageID}'),
+                    Text('Date: ${booking.eventDate} ${booking.eventTime}'),
+                    Text(
+                      'Total Price: RM ${booking.totalPrice.toStringAsFixed(2)}',
+                    ),
+                    Text(
+                      'Item: ${booking.selectedAddItems.toString().replaceAll('[', '').replaceAll(']', '')}',
+                    ),
+                    SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color:
+                            booking.status == "Rejected"
+                                ? Colors.red.shade700
+                                : booking.status == "Pending"
+                                ? Colors.yellow.shade700
+                                : booking.status == "Confirmed"
+                                ? Colors.green.shade800
+                                : Colors.deepPurple.shade200,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        "Status: ${booking.status}",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 12),
+                  ],
                 ),
                 trailing: IconButton(
                   icon: const Icon(Icons.edit),

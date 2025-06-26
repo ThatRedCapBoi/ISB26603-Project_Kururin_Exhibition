@@ -190,8 +190,14 @@ class _BookingListPageState extends State<BookingListPage> {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.deepPurple.shade200,
-
+                          color:
+                              booking.status == "Rejected"
+                                  ? Colors.red.shade700
+                                  : booking.status == "Pending"
+                                  ? Colors.yellow.shade700
+                                  : booking.status == "Confirmed"
+                                  ? Colors.green.shade800
+                                  : Colors.deepPurple.shade200,
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
